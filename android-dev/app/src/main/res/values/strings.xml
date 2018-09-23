@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">lucyAR</string>
+
+    <string name="camera">lucyAR</string>
+    <string name="cancel">lucyAR</string>
+    <string name="send">lucyAR</string>
+    <string name="menu">lucyAR</string>
+    <string name="search">lucyAR</string>
 </resources>

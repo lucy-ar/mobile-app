@@ -6,39 +6,63 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
 <item
 
-    android:id="@+id/action_favorites"
+    android:id="@+id/action_cancel"
 
     android:enabled="true"
 
-    android:icon="@drawable/ic_favorite_white_24dp"
+    android:icon="@drawable/cancel"
 
-    android:title="@string/text_favorites"
+    android:title="@string/cancel"
 
     app:showAsAction="ifRoom" />
 
 <item
 
-    android:id="@+id/action_schedules"
+    android:id="@+id/action_send"
 
     android:enabled="true"
 
-    android:icon="@drawable/ic_access_time_white_24dp"
+    android:icon="@drawable/send"
 
-    android:title="@string/text_schedules"
+    android:title="@string/send"
 
     app:showAsAction="ifRoom" />
 
 <item
 
-    android:id="@+id/action_music"
+    android:id="@+id/action_camera"
 
     android:enabled="true"
 
-    android:icon="@drawable/ic_audiotrack_white_24dp"
+    android:icon="@drawable/camera"
 
-    android:title="@string/text_music"
+    android:title="@string/camera"
 
     app:showAsAction="ifRoom" />
+
+    <item
+
+        android:id="@+id/action_menu"
+
+        android:enabled="true"
+
+        android:icon="@drawable/menu"
+
+        android:title="@string/menu"
+
+        app:showAsAction="ifRoom" />
+
+    <item
+
+        android:id="@+id/action_search"
+
+        android:enabled="true"
+
+        android:icon="@drawable/search"
+
+        android:title="@string/search"
+
+        app:showAsAction="ifRoom" />
 
 </menu>
 

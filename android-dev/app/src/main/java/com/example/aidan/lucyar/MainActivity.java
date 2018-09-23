@@ -48,16 +48,16 @@ public class MainActivity extends AppCompatActivity {
 
                         switch (item.getItemId()) {
 
-                            case R.id.action_favorites:
-
-
-
-                            case R.id.action_schedules:
-
-
-
-                            case R.id.action_music:
-
+                            case R.id.action_send:
+                                break;
+                            case R.id.action_camera:
+                                break;
+                            case R.id.action_cancel:
+                                break;
+                            case R.id.action_menu:
+                                break;
+                            case R.id.action_search:
+                                break;
 
 
                         }

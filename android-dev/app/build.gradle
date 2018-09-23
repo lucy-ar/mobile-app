@@ -27,7 +27,6 @@ android {
         }
     }
 }
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0-rc02'
@@ -36,4 +35,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.google.vr:sdk-audio:1.160.0'
     implementation 'com.google.vr:sdk-base:1.160.0'
+    implementation 'com.google.ar:core:1.4.0'
+
 }

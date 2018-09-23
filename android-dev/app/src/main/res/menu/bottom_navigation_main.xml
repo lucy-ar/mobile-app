@@ -18,7 +18,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
 <item
 
-    android:id="@+id/action_send"
+    android:id="@+id/send"
 
     android:enabled="true"
 
@@ -26,11 +26,11 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
     android:title="@string/send"
 
-    app:showAsAction="ifRoom" />
+    app:showAsAction="always" />
 
 <item
 
-    android:id="@+id/action_camera"
+    android:id="@+id/camera"
 
     android:enabled="true"
 
@@ -38,11 +38,11 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
     android:title="@string/camera"
 
-    app:showAsAction="ifRoom" />
+    app:showAsAction="always" />
 
     <item
 
-        android:id="@+id/action_menu"
+        android:id="@+id/menu"
 
         android:enabled="true"
 
@@ -50,19 +50,19 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
         android:title="@string/menu"
 
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
 
-        android:id="@+id/action_search"
+        android:id="@+id/search"
 
         android:enabled="true"
 
-        android:icon="@drawable/search"
+        android:icon="@drawable/search_test"
 
         android:title="@string/search"
 
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>
 

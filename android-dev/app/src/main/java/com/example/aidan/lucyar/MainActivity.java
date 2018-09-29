@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE) {
             if (resultCode == RESULT_OK) {
                 imageView.setImageURI(Uri.parse(imageFilePath));
+                //TODO: call request to do a posty boi (post request)
             }
             else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You cancelled the operation", Toast.LENGTH_SHORT).show();

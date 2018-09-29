@@ -7,6 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/image"/>
+
     <android.support.design.widget.BottomNavigationView
 
         android:id="@+id/bottom_navigation"
@@ -17,11 +22,13 @@
 
         android:layout_alignParentBottom="true"
 
-        app:menu="@menu/bottom_navigation_main" />
-        <!--app:itemBackground="@color/colorPrimary"-->
-        <!--app:itemIconTint="@drawable/nav_item_color_state"-->
+        app:itemBackground="@color/colorPrimary"
+        app:itemIconTint="@drawable/nav_item_color_state"
 
-        <!--app:itemTextColor="@drawable/nav_item_color_state"-->
+        app:itemTextColor="@drawable/nav_item_color_state"
+
+        app:menu="@menu/bottom_navigation_main" />
+
 
 
 

@@ -43,6 +43,7 @@
     <meta-data
             android:name="com.google.ar.core"
             android:value="optional" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

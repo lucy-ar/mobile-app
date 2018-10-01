@@ -2,6 +2,9 @@ package com.example.aidan.lucyar;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.icu.text.Replaceable;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Environment;
@@ -20,10 +23,23 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Locale;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
     private Uri mImageUri;
     private ImageView imageView;
     private String imageFilePath = "";
+    private AzureWrapper azureWrapper;
+    private Bitmap imageCapture;
     public static final int REQUEST_IMAGE = 100;
     public static final int REQUEST_PERMISSION = 200;
 
@@ -94,7 +110,16 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_IMAGE) {
             if (resultCode == RESULT_OK) {
+                File file = new File(imageFilePath);
+//                RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
+//                MultipartBody.Part body = MultipartBody.Part.createFormData("upload",
+//                        file.getName(),
+//                        requestBody);
+//                sendNetworkRequest(body);
                 imageView.setImageURI(Uri.parse(imageFilePath));
+                imageCapture = BitmapFactory.decodeFile(imageFilePath);
+
+
                 //TODO: call request to do a posty boi (post request)
             }
             else if (resultCode == RESULT_CANCELED) {
@@ -112,6 +137,31 @@ public class MainActivity extends AppCompatActivity {
         imageFilePath = image.getAbsolutePath();
 
         return image;
+    }
+
+    public void sendNetworkRequest(MultipartBody.Part post) {
+        String AZURE_ENDPOINT = "https://canadacentral.api.cognitive.microsoft.com/vision/v1.0/";
+        Retrofit.Builder azureBuilder = new Retrofit.Builder()
+                .baseUrl(AZURE_ENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create());
+        Retrofit azureApiCall = azureBuilder.build();
+        azureWrapper = azureApiCall.create(AzureWrapper.class);
+        Call<ResponseBody> callApi = azureWrapper.describe(post);
+        callApi.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Toast.makeText(getBaseContext(), response.body().toString(), Toast.LENGTH_LONG)
+                        .show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getBaseContext(), "connection not successful :(", Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
+
+
     }
 
 }

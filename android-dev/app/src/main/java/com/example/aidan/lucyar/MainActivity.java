@@ -18,8 +18,13 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Locale;
 
@@ -111,11 +116,18 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE) {
             if (resultCode == RESULT_OK) {
                 File file = new File(imageFilePath);
-//                RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
-//                MultipartBody.Part body = MultipartBody.Part.createFormData("upload",
-//                        file.getName(),
-//                        requestBody);
-//                sendNetworkRequest(body);
+                try {
+                    InputStream in = new FileInputStream(file);
+                    byte[] buf;
+                    buf = new byte[in.available()];
+                    while (in.read(buf) != -1);
+                    RequestBody body = RequestBody
+                            .create(MediaType.parse("application/octet-stream"), buf);
+                    sendNetworkRequest(body);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 imageView.setImageURI(Uri.parse(imageFilePath));
                 imageCapture = BitmapFactory.decodeFile(imageFilePath);
 
@@ -139,23 +151,23 @@ public class MainActivity extends AppCompatActivity {
         return image;
     }
 
-    public void sendNetworkRequest(MultipartBody.Part post) {
+    public void sendNetworkRequest(RequestBody post) {
         String AZURE_ENDPOINT = "https://canadacentral.api.cognitive.microsoft.com/vision/v1.0/";
         Retrofit.Builder azureBuilder = new Retrofit.Builder()
                 .baseUrl(AZURE_ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create());
         Retrofit azureApiCall = azureBuilder.build();
         azureWrapper = azureApiCall.create(AzureWrapper.class);
-        Call<ResponseBody> callApi = azureWrapper.describe(post);
-        callApi.enqueue(new Callback<ResponseBody>() {
+        Call<AzureResponseHandler> callApi = azureWrapper.describe(post, "2f931d84e94b4ee3bce4190e0a984e3f", "application/octet-stream");
+        callApi.enqueue(new Callback<AzureResponseHandler>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Toast.makeText(getBaseContext(), response.body().toString(), Toast.LENGTH_LONG)
+            public void onResponse(Call<AzureResponseHandler> call, Response<AzureResponseHandler> response) {
+                Toast.makeText(getBaseContext(), response.body().getDescription().getCaptions().get(0).getText(), Toast.LENGTH_LONG)
                         .show();
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<AzureResponseHandler> call, Throwable t) {
                 Toast.makeText(getBaseContext(), "connection not successful :(", Toast.LENGTH_LONG)
                         .show();
             }

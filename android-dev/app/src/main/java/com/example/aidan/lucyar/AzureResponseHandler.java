@@ -5,27 +5,40 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class AzureResponseHandler {
-    @SerializedName("text")
+
+    @SerializedName("description")
     @Expose
-    private String text;
-    @SerializedName("confidence")
+    private Description description;
+    @SerializedName("requestId")
     @Expose
-    private Double confidence;
+    private String requestId;
+    @SerializedName("metadata")
+    @Expose
+    private Metadata metadata;
 
-    public String getText() {
-        return text;
+    public Description getDescription() {
+        return description;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setDescription(Description description) {
+        this.description = description;
     }
 
-    public Double getConfidence() {
-        return confidence;
+    public String getRequestId() {
+        return requestId;
     }
 
-    public void setConfidence(Double confidence) {
-        this.confidence = confidence;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
+    }
+
 }
 

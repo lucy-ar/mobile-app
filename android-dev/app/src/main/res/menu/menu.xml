@@ -6,62 +6,41 @@
 
     <item
 
-        android:id="@+id/action_cancel"
-
-        android:enabled="true"
-
-        android:icon="@drawable/cancel"
-
-        android:title="@string/cancel"
-
-        app:showAsAction="ifRoom" />
-
-    <item
-
-        android:id="@+id/action_send"
-
-        android:enabled="true"
-
-        android:icon="@drawable/send"
-
-        android:title="@string/send"
-
-        app:showAsAction="ifRoom" />
-
-    <item
-
-        android:id="@+id/action_camera"
-
-        android:enabled="true"
-
-        android:icon="@drawable/camera"
-
-        android:title="@string/camera"
-
-        app:showAsAction="ifRoom" />
-
-    <item
-
-        android:id="@+id/action_menu"
-
-        android:enabled="true"
-
-        android:icon="@drawable/menu"
-
-        android:title="@string/menu"
-
-        app:showAsAction="ifRoom" />
-
-    <item
-
         android:id="@+id/action_search"
 
         android:enabled="true"
 
-        android:icon="@drawable/search"
+        android:icon="@drawable/search_icon"
 
         android:title="@string/search"
 
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/send_icon"
+        android:enabled="true"
+        android:icon="@drawable/share"
+        app:showAsAction="ifRoom"
+        android:title="Send It" />
+
+    <item
+
+        android:id="@+id/login"
+
+        android:enabled="true"
+
+        android:icon="@drawable/menu_icon"
+
+        android:title="Login"
+
+        app:showAsAction="never" />
+
+    <item
+    android:enabled="true"
+    android:icon="@drawable/quantum_ic_settings_white_24"
+    app:showAsAction="never"
+    android:title="Settings"/>
+
+
 
 </menu>

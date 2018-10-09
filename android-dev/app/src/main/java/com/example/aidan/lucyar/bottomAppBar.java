@@ -96,6 +96,9 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                         Fragment settingsPage = new SettingsPage();
                         changeFragment(settingsPage);
                         break;
+                    case R.id.login:
+                        Intent loginPage = new Intent(bottomAppBar.this, LoginActivity.class);
+                        startActivity(loginPage);
                 }
                 return true;
             }

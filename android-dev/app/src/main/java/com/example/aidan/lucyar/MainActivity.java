@@ -13,6 +13,8 @@ import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private AzureWrapper azureWrapper;
     private Bitmap imageCapture;
     private TextView classification;
+    private DrawerLayout mDrawerlayout;
+    private ActionBarDrawerToggle mToggle ;
     public static final int REQUEST_IMAGE = 100;
     public static final int REQUEST_PERMISSION = 200;
 
@@ -176,5 +180,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 }

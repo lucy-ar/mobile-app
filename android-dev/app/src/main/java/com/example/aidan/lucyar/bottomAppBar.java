@@ -11,10 +11,13 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -47,6 +50,7 @@ public class bottomAppBar extends AppCompatActivity {
     private AzureWrapper azureWrapper;
     private Bitmap imageCapture;
     private TextView classification;
+    private DrawerLayout drawerLayout;
     public static final int REQUEST_IMAGE = 100;
     public static final int REQUEST_PERMISSION = 200;
 
@@ -55,8 +59,17 @@ public class bottomAppBar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_bottom_bar);
         this.imageView = (ImageView) findViewById(R.id.image);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         BottomAppBar bar = (BottomAppBar) findViewById(R.id.bar);
         setSupportActionBar(bar);
+        bar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerLayout.openDrawer(Gravity.START);
+            }
+
+        });
+
         FloatingActionButton cameraButton = (FloatingActionButton) findViewById(R.id.fab);
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +90,8 @@ public class bottomAppBar extends AppCompatActivity {
             }
         });
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();

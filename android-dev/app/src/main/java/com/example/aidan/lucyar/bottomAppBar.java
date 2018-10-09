@@ -12,6 +12,9 @@ import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentContainer;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +46,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.aidan.lucyar.MainActivity.REQUEST_IMAGE;
 
-public class bottomAppBar extends AppCompatActivity {
+public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFragmentInteractionListener, SettingsPage.OnFragmentInteractionListener{
+    private FragmentManager fragmentManager;
     private Uri mImageUri;
     private ImageView imageView;
     private String imageFilePath = "";
@@ -82,8 +86,15 @@ public class bottomAppBar extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.send_icon:
+
                         break;
                     case R.id.action_search:
+                        Fragment searchPage = new SearchPage();
+                        changeFragment(searchPage);
+                        break;
+                    case R.id.settings:
+                        Fragment settingsPage = new SettingsPage();
+                        changeFragment(settingsPage);
                         break;
                 }
                 return true;
@@ -91,14 +102,16 @@ public class bottomAppBar extends AppCompatActivity {
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
 
+
         return super.onCreateOptionsMenu(menu);
     }
+
+
 
 
     @Override
@@ -139,6 +152,11 @@ public class bottomAppBar extends AppCompatActivity {
                 Toast.makeText(this, "You cancelled the operation", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri){
+
     }
 
     private void openCameraIntent() {
@@ -189,5 +207,14 @@ public class bottomAppBar extends AppCompatActivity {
                         .show();
             }
         });
+    }
+
+    public void changeFragment(Fragment fragment) {
+        fragmentManager = getSupportFragmentManager();
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.drawer_layout, fragment, fragment.getClass().getSimpleName())
+                .addToBackStack(null)
+                .commit();
     }
 }

@@ -31,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -95,7 +96,7 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.send_icon:
+                    case R.id.share_bottom:
 
                         break;
                     case R.id.action_search:
@@ -194,7 +195,6 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
         imageFilePath = image.getAbsolutePath();
-
         return image;
     }
     public void sendNetworkRequest(RequestBody post) {
@@ -218,7 +218,6 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                         .show();
             }
         });
-    }
 
     public void changeFragment(Fragment fragment) {
         fragmentManager = getSupportFragmentManager();

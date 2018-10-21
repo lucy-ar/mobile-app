@@ -33,8 +33,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="imageAsset" value="C:\Users\Dell\Desktop\buttons\mdpi\icon1.png" />
-                                      <entry key="outputName" value="share" />
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="C:\Users\Dell\Desktop\baseline-account_circle-24px.svg" />
+                                      <entry key="outputName" value="profile" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -46,9 +47,10 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="foregroundAssetType" value="CLIP_ART" />
-                                      <entry key="foregroundImage" value="C:\Users\Benjamin\Downloads\Archive\xxhdpi\icon1.png" />
-                                      <entry key="outputName" value="search_icon" />
+                                      <entry key="backgroundLayerName" value="search_icon_background" />
+                                      <entry key="foregroundImage" value="C:\Users\Dell\Desktop\baseline-account_circle-24px.svg" />
+                                      <entry key="foregroundLayerName" value="profile" />
+                                      <entry key="outputName" value="profile_icon" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -80,11 +82,6 @@
                                 </PersistentState>
                               </value>
                             </entry>
-                          </map>
-                        </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

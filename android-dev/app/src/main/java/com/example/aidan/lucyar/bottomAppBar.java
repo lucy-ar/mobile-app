@@ -211,57 +211,6 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
             }
         });
 
-        //profile button
-        Button profileButton = (Button) findViewById(R.id.profile);
-        profileButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Fragment profilePage = new ProfilePage();
-                changeFragment(profilePage);
-            }
-        });
-
-        //Search button on side nav
-        Button searchButton = (Button) findViewById(R.id.search);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Fragment searchPage = new SearchPage();
-                changeFragment(searchPage);
-            }
-        });
-
-        //Setting button on side nav
-        Button settingButton = (Button) findViewById(R.id.settings);
-        settingButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Fragment settingsPage = new SettingsPage();
-                changeFragment(settingsPage);
-            }
-        });
-
-        //Share button on side nav
-        Button shareButton = (Button) findViewById(R.id.share);
-        shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickShare(v);
-            }
-        });
-
-        //Share button on bottom nav
-        Button shareButtonBottom = (Button) findViewById(R.id.share_bottom);
-        shareButtonBottom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent myIntent = new Intent(Intent.ACTION_SEND);
-                myIntent.setType("text/plain");
-                String shareBody = "Your body here";
-                String shareSub = "Your Subject here";
-                myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
-                myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-                startActivity(Intent.createChooser(myIntent, "Share using"));
-            }
-        });
-    }
     public void changeFragment(Fragment fragment) {
         fragmentManager = getSupportFragmentManager();
         fragmentManager
@@ -269,14 +218,5 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                 .replace(R.id.drawer_layout, fragment, fragment.getClass().getSimpleName())
                 .addToBackStack(null)
                 .commit();
-    }
-    public void onClickShare(View v) {
-        Intent myIntent = new Intent(Intent.ACTION_SEND);
-        myIntent.setType("text/plain");
-        String shareBody = "Your body here";
-        String shareSub = "Your Subject here";
-        myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
-        myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-        startActivity(Intent.createChooser(myIntent, "Share using"));
     }
 }

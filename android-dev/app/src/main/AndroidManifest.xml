@@ -59,7 +59,8 @@
         <!-- <activity android:name=".bottomAppBar"></activity> -->
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login" />
+        <activity android:name=".sideNavBar"></activity>
     </application>
 
 </manifest>

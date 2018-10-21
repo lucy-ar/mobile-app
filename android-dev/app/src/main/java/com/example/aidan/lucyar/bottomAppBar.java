@@ -1,12 +1,17 @@
 package com.example.aidan.lucyar;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
@@ -17,6 +22,7 @@ import android.support.v4.app.FragmentContainer;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -26,8 +32,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.aidan.lucyar.drawar.DrawAR;
+import com.github.ybq.android.spinkit.style.DoubleBounce;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,10 +67,12 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
     public static final int REQUEST_IMAGE = 100;
     public static final int REQUEST_PERMISSION = 200;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_bottom_bar);
+
         this.imageView = (ImageView) findViewById(R.id.image);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         BottomAppBar bar = (BottomAppBar) findViewById(R.id.bar);
@@ -71,14 +82,13 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
             public void onClick(View view) {
                 drawerLayout.openDrawer(Gravity.START);
             }
-
         });
 
         FloatingActionButton cameraButton = (FloatingActionButton) findViewById(R.id.fab);
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openCameraIntent();
+                dialogBoxforARorImageCapture(bottomAppBar.this);
             }
         });
         bar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -109,8 +119,6 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
-
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -219,5 +227,30 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                 .replace(R.id.drawer_layout, fragment, fragment.getClass().getSimpleName())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public void dialogBoxforARorImageCapture(Activity context) {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(context);
+        }
+        builder.setTitle("Select Camera Function")
+                .setMessage("Which would you like to do?")
+                .setPositiveButton(R.string.AR_DRAW, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent arPage = new Intent (bottomAppBar.this, DrawAR.class);
+                        startActivity(arPage);
+                    }
+                })
+                .setNegativeButton(R.string.IMAGE_CAPTURE, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                        openCameraIntent();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

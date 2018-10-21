@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:id="@+id/drawer_layout">
 
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
@@ -23,8 +24,8 @@
             android:layout_gravity="bottom"
             app:backgroundTint="@color/colorPrimary"
             app:fabAlignmentMode="center"
-            app:fabCradleRoundedCornerRadius="5dp"
-            app:fabCradleMargin="5dp"
+            app:fabCradleRoundedCornerRadius="7dp"
+            app:fabCradleMargin="7dp"
             app:fabCradleVerticalOffset="0dp"
             app:navigationIcon="@drawable/menu_icon"
             />

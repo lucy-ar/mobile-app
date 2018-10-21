@@ -23,4 +23,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="AR_DRAW">AR Draw</string>
+    <string name="IMAGE_CAPTURE">Image Capture</string>
 </resources>

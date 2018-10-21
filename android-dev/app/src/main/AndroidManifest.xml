@@ -50,17 +50,11 @@
             android:value="optional" />
 
         <activity android:name=".bottomAppBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <!-- <activity android:name=".bottomAppBar"></activity> -->
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login" />
-        <activity android:name=".sideNavBar"></activity>
     </application>
 
 </manifest>

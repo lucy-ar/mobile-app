@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.bottomappbar.BottomAppBar;
@@ -56,15 +57,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.example.aidan.lucyar.MainActivity.REQUEST_IMAGE;
 
-public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFragmentInteractionListener, SettingsPage.OnFragmentInteractionListener{
+public class bottomAppBar extends AppCompatActivity
+                          implements SearchPage.OnFragmentInteractionListener,
+                                     SettingsPage.OnFragmentInteractionListener,
+                                     ProfilePage.OnFragmentInteractionListener
+{
     private FragmentManager fragmentManager;
     private Uri mImageUri;
     private ImageView imageView;
     private String imageFilePath = "";
     private AzureWrapper azureWrapper;
     private Bitmap imageCapture;
+    private NavigationView sideNav;
     private TextView classification;
     private DrawerLayout drawerLayout;
+    private Button profileButton;
     public static final int REQUEST_IMAGE = 100;
     public static final int REQUEST_PERMISSION = 200;
 
@@ -76,6 +83,9 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
 
         this.imageView = (ImageView) findViewById(R.id.image);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        changeNav();
+
         BottomAppBar bar = (BottomAppBar) findViewById(R.id.bar);
         setSupportActionBar(bar);
         bar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -84,7 +94,6 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                 drawerLayout.openDrawer(Gravity.START);
             }
         });
-
         FloatingActionButton cameraButton = (FloatingActionButton) findViewById(R.id.fab);
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +106,13 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.share_bottom:
-
+                        Intent myIntent = new Intent(Intent.ACTION_SEND);
+                        myIntent.setType("text/plain");
+                        String shareBody = "Your body here";
+                        String shareSub = "Your Subject here";
+                        myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+                        myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                        startActivity(Intent.createChooser(myIntent, "Share using"));
                         break;
                     case R.id.action_search:
                         Fragment searchPage = new SearchPage();
@@ -110,10 +125,13 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                     case R.id.login:
                         Intent loginPage = new Intent(bottomAppBar.this, LoginActivity.class);
                         startActivity(loginPage);
+
                 }
                 return true;
+
             }
         });
+
     }
 
     @Override
@@ -122,8 +140,6 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
         menuInflater.inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
-
 
 
     @Override
@@ -148,7 +164,7 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                     InputStream in = new FileInputStream(file);
                     byte[] buf;
                     buf = new byte[in.available()];
-                    while (in.read(buf) != -1);
+                    while (in.read(buf) != -1) ;
                     RequestBody body = RequestBody
                             .create(MediaType.parse("application/octet-stream"), buf);
                     sendNetworkRequest(body);
@@ -159,17 +175,18 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                 imageView.setImageURI(Uri.parse(imageFilePath));
                 imageCapture = BitmapFactory.decodeFile(imageFilePath);
 
-            }
-            else if (resultCode == RESULT_CANCELED) {
+            } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You cancelled the operation", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri){
+    public void onFragmentInteraction(Uri uri) {
 
     }
+
+
 
     private void openCameraIntent() {
         Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -178,18 +195,17 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 return;
             }
-            Uri photoUri = FileProvider.getUriForFile(this, getPackageName() +".provider", photoFile);
+            Uri photoUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", photoFile);
             pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
             startActivityForResult(pictureIntent, REQUEST_IMAGE);
         }
     }
 
-    private File createImageFile() throws IOException{
+    private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "IMG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -197,6 +213,7 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
         imageFilePath = image.getAbsolutePath();
         return image;
     }
+
     public void sendNetworkRequest(RequestBody post) {
         String AZURE_ENDPOINT = "https://canadacentral.api.cognitive.microsoft.com/vision/v1.0/";
         Retrofit.Builder azureBuilder = new Retrofit.Builder()
@@ -218,8 +235,9 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                         .show();
             }
         });
+    }
 
-    public void changeFragment(Fragment fragment) {
+    public void changeFragment (Fragment fragment){
         fragmentManager = getSupportFragmentManager();
         fragmentManager
                 .beginTransaction()
@@ -228,7 +246,7 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                 .commit();
     }
 
-    public void dialogBoxforARorImageCapture(Activity context) {
+    public void dialogBoxforARorImageCapture (Activity context){
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
@@ -239,7 +257,7 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                 .setMessage("Which would you like to do?")
                 .setPositiveButton(R.string.AR_DRAW, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent arPage = new Intent (bottomAppBar.this, DrawAR.class);
+                        Intent arPage = new Intent(bottomAppBar.this, DrawAR.class);
                         startActivity(arPage);
                     }
                 })
@@ -251,5 +269,50 @@ public class bottomAppBar extends AppCompatActivity implements SearchPage.OnFrag
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+    public void onClickShare(View v) {
+        Intent myIntent = new Intent(Intent.ACTION_SEND);
+        myIntent.setType("text/plain");
+        String shareBody = "Your body here";
+        String shareSub = "Your Subject here";
+        myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+        myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(myIntent, "Share using"));
+    }
+
+    public void changeNav (){
+        NavigationView sideNav = (NavigationView) findViewById(R.id.navigation_view);
+        sideNav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.share:
+                        Intent myIntent = new Intent(Intent.ACTION_SEND);
+                        myIntent.setType("text/plain");
+                        String shareBody = "Your body here";
+                        String shareSub = "Your Subject here";
+                        myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+                        myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                        startActivity(Intent.createChooser(myIntent, "Share using"));
+                        break;
+                    case R.id.profile:
+                        Fragment profilePage = new ProfilePage();
+                        drawerLayout.closeDrawers();
+                        changeFragment(profilePage);
+                        break;
+                    case R.id.search:
+                        Fragment searchPage = new SearchPage();
+                        drawerLayout.closeDrawers();
+                        changeFragment(searchPage);
+                        break;
+                    case R.id.settings:
+                        Fragment settingsPage = new SettingsPage();
+                        drawerLayout.closeDrawers();
+                        changeFragment(settingsPage);
+                        break;
+                }
+                return true;
+            }
+        });
     }
 }

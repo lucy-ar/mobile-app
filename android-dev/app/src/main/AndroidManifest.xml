@@ -50,10 +50,7 @@
             android:name="com.google.ar.core"
             android:value="optional" />
 
-        <activity android:name=".bottomAppBar">
-
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
+        <activity android:name=".bottomAppBar"></activity>
         <activity
             android:name=".drawar.DrawAR"
             android:label="ar draw"></activity>
@@ -63,6 +60,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".LoginActivity">
+
         </activity>
     </application>
 

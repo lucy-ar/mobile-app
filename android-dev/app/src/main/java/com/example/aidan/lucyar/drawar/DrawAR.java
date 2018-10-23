@@ -129,6 +129,8 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
     private boolean bInstallRequested;
 
     private TrackingState mState;
+    private final Object singleTapAnchorLock = new Object();
+    private MotionEvent queuedSingleTap;
     /**
      * Setup the app when main activity is created
      */
@@ -216,6 +218,38 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         mDetector.setOnDoubleTapListener(this);
         mStrokes = new ArrayList<>();
 
+//
+//        //tina's code
+//
+//        // Set up tap listener.
+//        GestureDetector gestureDetector = new GestureDetector(
+//                this,
+//                new GestureDetector.SimpleOnGestureListener() {
+//                    @Override
+//                    public boolean onSingleTapUp(MotionEvent e) {
+//                        synchronized (singleTapAnchorLock) {
+//                            queuedSingleTap = e;
+//                        }
+//                        return true;
+//                    }
+//
+//                    @Override
+//                    public boolean onDown(MotionEvent e) {
+//                        return true;
+//                    }
+//                });
+//
+//
+//
+//        // Initialize the "Clear" button. Clicking it will clear the current anchor, if it exists.
+//        Button clearButton = findViewById(R.id);
+//        clearButton.setOnClickListener(
+//                (unusedView) -> {
+//                    synchronized (singleTapAnchorLock) {
+//                        setNewAnchor(null);
+//                    }
+//                });
+//        //tina's code ends
 
     }
 

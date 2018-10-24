@@ -50,10 +50,10 @@
             android:name="com.google.ar.core"
             android:value="optional" />
 
-        <activity android:name=".bottomAppBar"></activity>
+        <activity android:name=".bottomAppBar" />
         <activity
             android:name=".drawar.DrawAR"
-            android:label="ar draw"></activity>
+            android:label="ar draw" />
         <activity android:name=".startScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,9 +61,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity">
-
-        </activity>
+        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".drawar.objectAR"></activity>
     </application>
 
 </manifest>

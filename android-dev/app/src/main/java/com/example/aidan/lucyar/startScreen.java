@@ -28,6 +28,6 @@ public class startScreen extends AppCompatActivity {
                 finish();
             }
 
-        }, 3000L);
+        }, 1000L);
     }
 }

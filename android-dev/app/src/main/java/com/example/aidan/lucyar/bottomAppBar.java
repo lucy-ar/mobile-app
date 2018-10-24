@@ -41,6 +41,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.aidan.lucyar.drawar.DrawAR;
+import com.example.aidan.lucyar.drawar.objectAR;
 import com.github.ybq.android.spinkit.style.DoubleBounce;
 
 import java.io.File;
@@ -261,7 +262,7 @@ public class bottomAppBar extends AppCompatActivity
                 .setMessage("Which would you like to do?")
                 .setPositiveButton(R.string.AR_DRAW, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent arPage = new Intent(bottomAppBar.this, DrawAR.class);
+                        Intent arPage = new Intent(bottomAppBar.this, objectAR.class);
                         startActivity(arPage);
                     }
                 })

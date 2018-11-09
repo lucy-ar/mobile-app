@@ -23,6 +23,7 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -35,6 +36,9 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class BackgroundRenderer {
     private static final String TAG = BackgroundRenderer.class.getSimpleName();
+
+    private static final String VERTEX_SHADER_NAME = "shaders/screenquad.vert";
+    private static final String FRAGMENT_SHADER_NAME = "shaders/screenquad.frag";
 
     private static final int COORDS_PER_VERTEX = 3;
     private static final int TEXCOORDS_PER_VERTEX = 2;
@@ -100,17 +104,22 @@ public class BackgroundRenderer {
             numVertices * TEXCOORDS_PER_VERTEX * FLOAT_SIZE);
         bbTexCoordsTransformed.order(ByteOrder.nativeOrder());
         mQuadTexCoordTransformed = bbTexCoordsTransformed.asFloatBuffer();
+        try {
+            int vertexShader =
+                    ShaderUtil.loadGLShader(TAG, context, GLES20.GL_VERTEX_SHADER, VERTEX_SHADER_NAME);
+            int fragmentShader =
+                    ShaderUtil.loadGLShader(TAG, context, GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_NAME);
+            mQuadProgram = GLES20.glCreateProgram();
+            GLES20.glAttachShader(mQuadProgram, vertexShader);
+            GLES20.glAttachShader(mQuadProgram, fragmentShader);
+            GLES20.glLinkProgram(mQuadProgram);
+            GLES20.glUseProgram(mQuadProgram);
 
-        int vertexShader = ShaderUtil.loadGLShader(TAG, context,
-                GLES20.GL_VERTEX_SHADER, R.raw.screenquad_vertex);
-        int fragmentShader = ShaderUtil.loadGLShader(TAG, context,
-                GLES20.GL_FRAGMENT_SHADER, R.raw.screenquad_fragment_oes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        mQuadProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(mQuadProgram, vertexShader);
-        GLES20.glAttachShader(mQuadProgram, fragmentShader);
-        GLES20.glLinkProgram(mQuadProgram);
-        GLES20.glUseProgram(mQuadProgram);
+
 
         ShaderUtil.checkGLError(TAG, "Program creation");
 

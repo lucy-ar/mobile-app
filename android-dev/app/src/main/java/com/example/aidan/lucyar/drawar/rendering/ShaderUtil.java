@@ -88,6 +88,9 @@ public class ShaderUtil {
         }
         return shader;
     }
+
+
+
     /**
      * Checks if we've had an error inside of OpenGL ES, and if so what that error is.
      *

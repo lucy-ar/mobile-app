@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2017 Google Inc. All Rights Reserved.
  *
@@ -20,20 +19,17 @@ package com.example.aidan.lucyar.drawar;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.example.aidan.lucyar.R;
-import com.example.aidan.lucyar.drawar.helpers.CameraPermissionHelper;
-import com.example.aidan.lucyar.drawar.helpers.FullScreenHelper;
-import com.example.aidan.lucyar.drawar.helpers.SnackbarHelper;
-import com.example.aidan.lucyar.drawar.helpers.TapHelper;
-import com.example.aidan.lucyar.drawar.rendering.BackgroundRenderer;
-import com.example.aidan.lucyar.drawar.rendering.ObjectRenderer;
-import com.example.aidan.lucyar.drawar.rendering.PlaneRenderer;
-import com.example.aidan.lucyar.drawar.rendering.PointCloudRenderer;
+import com.example.aidan.lucyar.drawar.poly.AsyncFileDownloader;
+import com.example.aidan.lucyar.drawar.poly.AsyncHttpRequest;
+import com.example.aidan.lucyar.drawar.poly.PolyApi;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
@@ -46,6 +42,15 @@ import com.google.ar.core.PointCloud;
 import com.google.ar.core.Session;
 import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
+import com.example.aidan.lucyar.drawar.helpers.CameraPermissionHelper;
+import com.example.aidan.lucyar.drawar.helpers.DisplayRotationHelper;
+import com.example.aidan.lucyar.drawar.helpers.FullScreenHelper;
+import com.example.aidan.lucyar.drawar.helpers.SnackbarHelper;
+import com.example.aidan.lucyar.drawar.helpers.TapHelper;
+import com.example.aidan.lucyar.drawar.rendering.BackgroundRenderer;
+import com.example.aidan.lucyar.drawar.rendering.ObjectRenderer;
+import com.example.aidan.lucyar.drawar.rendering.PlaneRenderer;
+import com.example.aidan.lucyar.drawar.rendering.PointCloudRenderer;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException;
@@ -53,9 +58,13 @@ import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException;
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException;
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
@@ -64,6 +73,12 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class objectAR extends AppCompatActivity implements GLSurfaceView.Renderer {
     private static final String TAG = objectAR.class.getSimpleName();
+
+    // The asset ID to download and display.
+    private static final String ASSET_ID = "fnTN9aw1q25";
+
+    // Scale factor to apply to asset when displaying.
+    private static final float ASSET_SCALE = 0.8f;
 
     // Rendering. The Renderers are created here, and initialized when the GL surface is created.
     private GLSurfaceView surfaceView;
@@ -76,14 +91,11 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
     private TapHelper tapHelper;
 
     private final BackgroundRenderer backgroundRenderer = new BackgroundRenderer();
-    private final ObjectRenderer virtualObject = new ObjectRenderer();
-    private final ObjectRenderer virtualObjectShadow = new ObjectRenderer();
     private final PlaneRenderer planeRenderer = new PlaneRenderer();
     private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
 
     // Temporary matrix allocated here to reduce number of allocations for each frame.
     private final float[] anchorMatrix = new float[16];
-    private static final float[] DEFAULT_COLOR = new float[] {0f, 0f, 0f, 0f};
 
     // Anchors created from taps used for object placing with a given color.
     private static class ColoredAnchor {
@@ -96,7 +108,28 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
         }
     }
 
-    private final ArrayList<ColoredAnchor> anchors = new ArrayList<>();
+    private final ArrayList<Anchor> anchors = new ArrayList<>();
+
+    private ObjectRenderer virtualObject = null;
+
+    // Our background thread, which does all of the heavy lifting so we don't block the main thread.
+    private HandlerThread mBackgroundThread;
+
+    // Handler for the background thread, to which we post background thread tasks.
+    private Handler mBackgroundThreadHandler;
+
+    // The AsyncFileDownloader responsible for downloading a set of data files from Poly.
+    private AsyncFileDownloader mFileDownloader;
+
+    // When we're finished downloading the asset files, we flip this boolean to true to
+    // indicate to the GL thread that it can import and load the model.
+    private volatile boolean mReadyToImport;
+
+    // Attributions text to display for the object (title and author).
+    private String mAttributionText = "";
+
+    // Have we already shown the attribution toast?
+    private boolean mShowedAttributionToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +150,27 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
         surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
         installRequested = false;
+
+        // Create a background thread, where we will do the heavy lifting.
+        mBackgroundThread = new HandlerThread("Worker");
+        mBackgroundThread.start();
+        mBackgroundThreadHandler = new Handler(mBackgroundThread.getLooper());
+
+        // Request the asset from the Poly API.
+        Log.d(TAG, "Requesting asset "+ ASSET_ID);
+        PolyApi.GetAsset(ASSET_ID, mBackgroundThreadHandler, new AsyncHttpRequest.CompletionListener() {
+            @Override
+            public void onHttpRequestSuccess(byte[] responseBody) {
+                // Successfully fetched asset information. This does NOT include the model's geometry,
+                // it's just the metadata. Let's parse it.
+                parseAsset(responseBody);
+            }
+            @Override
+            public void onHttpRequestFailure(int statusCode, String message, Exception exception) {
+                // Something went wrong with the request.
+                handleRequestFailure(statusCode, message, exception);
+            }
+        });
     }
 
     @Override
@@ -143,7 +197,7 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
                 }
 
                 // Create the session.
-                session = new Session(this);
+                session = new Session(/* context= */ this);
 
             } catch (UnavailableArcoreNotInstalledException
                     | UnavailableUserDeclinedInstallationException e) {
@@ -230,17 +284,8 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
             backgroundRenderer.createOnGlThread(/*context=*/ this);
             planeRenderer.createOnGlThread(/*context=*/ this, "models/trigrid.png");
             pointCloudRenderer.createOnGlThread(/*context=*/ this);
-
-            virtualObject.createOnGlThread(/*context=*/ this, "models/andy.obj", "models/andy.png");
-            virtualObject.setMaterialProperties(0.0f, 2.0f, 0.5f, 6.0f);
-
-            virtualObjectShadow.createOnGlThread(
-                    /*context=*/ this, "models/andy_shadow.obj", "models/andy_shadow.png");
-            virtualObjectShadow.setBlendMode(ObjectRenderer.BlendMode.Shadow);
-            virtualObjectShadow.setMaterialProperties(1.0f, 0.0f, 0.0f, 1.0f);
-
         } catch (IOException e) {
-            Log.e(TAG, "Failed to read an asset file", e);
+            Log.e(TAG, "Failed to read plane texture", e);
         }
     }
 
@@ -254,6 +299,11 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
     public void onDrawFrame(GL10 gl) {
         // Clear screen to notify driver it should not load any pixels from previous frame.
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        // If we are ready to import the object and haven't done so yet, do it now.
+        if (mReadyToImport && virtualObject == null) {
+            importDownloadedObject();
+        }
 
         if (session == null) {
             return;
@@ -321,19 +371,24 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
 
             // Visualize anchors created by touch.
             float scaleFactor = 1.0f;
-            for (ColoredAnchor coloredAnchor : anchors) {
-                if (coloredAnchor.anchor.getTrackingState() != TrackingState.TRACKING) {
+            for (Anchor anchor : anchors) {
+                if (anchor.getTrackingState() != TrackingState.TRACKING) {
                     continue;
                 }
                 // Get the current pose of an Anchor in world space. The Anchor pose is updated
                 // during calls to session.update() as ARCore refines its estimate of the world.
-                coloredAnchor.anchor.getPose().toMatrix(anchorMatrix, 0);
+                anchor.getPose().toMatrix(anchorMatrix, 0);
 
-                // Update and draw the model and its shadow.
-                virtualObject.updateModelMatrix(anchorMatrix, scaleFactor);
-                virtualObjectShadow.updateModelMatrix(anchorMatrix, scaleFactor);
-                virtualObject.draw(viewmtx, projmtx, colorCorrectionRgba, coloredAnchor.color);
-                virtualObjectShadow.draw(viewmtx, projmtx, colorCorrectionRgba, coloredAnchor.color);
+                // Update and draw the model.
+                if (virtualObject != null) {
+                    virtualObject.updateModelMatrix(anchorMatrix, ASSET_SCALE * scaleFactor);
+                    virtualObject.draw(viewmtx, projmtx, colorCorrectionRgba);
+
+                    // If we haven't yet showing the attribution toast, do it now.
+                    if (!mShowedAttributionToast) {
+                        showAttributionToast();
+                    }
+                }
             }
 
         } catch (Throwable t) {
@@ -360,29 +415,154 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
                     // Cap the number of objects created. This avoids overloading both the
                     // rendering system and ARCore.
                     if (anchors.size() >= 20) {
-                        anchors.get(0).anchor.detach();
+                        anchors.get(0).detach();
                         anchors.remove(0);
-                    }
-
-                    // Assign a color to the object for rendering based on the trackable type
-                    // this anchor attached to. For AR_TRACKABLE_POINT, it's blue color, and
-                    // for AR_TRACKABLE_PLANE, it's green color.
-                    float[] objColor;
-                    if (trackable instanceof Point) {
-                        objColor = new float[] {66.0f, 133.0f, 244.0f, 255.0f};
-                    } else if (trackable instanceof Plane) {
-                        objColor = new float[] {139.0f, 195.0f, 74.0f, 255.0f};
-                    } else {
-                        objColor = DEFAULT_COLOR;
                     }
 
                     // Adding an Anchor tells ARCore that it should track this position in
                     // space. This anchor is created on the Plane to place the 3D model
                     // in the correct position relative both to the world and to the plane.
-                    anchors.add(new ColoredAnchor(hit.createAnchor(), objColor));
+                    anchors.add(hit.createAnchor());
                     break;
                 }
             }
         }
     }
+
+    private void importDownloadedObject() {
+        try {
+            virtualObject = new ObjectRenderer();
+
+            byte[] objBytes = null;
+            byte[] textureBytes = null;
+            for (int i = 0; i < mFileDownloader.getEntryCount(); i++) {
+                AsyncFileDownloader.Entry thisEntry = mFileDownloader.getEntry(i);
+                if (thisEntry.fileName.toLowerCase().endsWith(".obj")) {
+                    objBytes = thisEntry.contents;
+                } else if (thisEntry.fileName.toLowerCase().endsWith(".png")) {
+                    textureBytes = thisEntry.contents;
+                }
+            }
+
+            if (objBytes == null || textureBytes == null) {
+                Log.e(TAG, "Downloaded asset doesn't have OBJ data and a PNG texture.");
+                return;
+            }
+            Log.d(TAG, "Importing OBJ.");
+
+            virtualObject.createOnGlThread(/*context=*/this, objBytes, textureBytes);
+            virtualObject.setMaterialProperties(0.0f, 3.5f, 1.0f, 6.0f);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to read or parse obj file");
+        }
+    }
+
+    // NOTE: this runs on the background thread.
+    private void parseAsset(byte[] assetData) {
+        Log.d(TAG, "Got asset response (" + assetData.length + " bytes). Parsing.");
+        String assetBody = new String(assetData, Charset.forName("UTF-8"));
+        Log.d(TAG, assetBody);
+        try {
+            JSONObject response = new JSONObject(assetBody);
+            String displayName = response.getString("displayName");
+            String authorName = response.getString("authorName");
+            Log.d(TAG, "Display name: " + displayName);
+            Log.d(TAG, "Author name: " + authorName);
+            mAttributionText = displayName + " by " + authorName;
+
+            // The asset may have several formats (OBJ, GLTF, FBX, etc). We will look for the OBJ format.
+            JSONArray formats = response.getJSONArray("formats");
+            boolean foundObjFormat = false;
+            for (int i = 0; i < formats.length(); i++) {
+                JSONObject format = formats.getJSONObject(i);
+                if (format.getString("formatType").equals("OBJ")) {
+                    // Found the OBJ format. The format gives us the URL of the data files that we should
+                    // download (which include the OBJ file, the MTL file and the textures). We will now
+                    // request those files.
+                    requestDataFiles(format);
+                    foundObjFormat = true;
+                    break;
+                }
+            }
+            if (!foundObjFormat) {
+                // If this happens, it's because the asset doesn't have a representation in the OBJ
+                // format. Since this simple sample code can only parse OBJ, we can't proceed.
+                // But other formats might be available, so if your client supports multiple formats,
+                // you could still try a different format instead.
+                Log.e(TAG, "Could not find OBJ format in asset.");
+                return;
+            }
+        } catch (JSONException jsonException) {
+            Log.e(TAG, "JSON parsing error while processing response: " + jsonException);
+            jsonException.printStackTrace();
+        }
+    }
+
+    // Requests the data files for the OBJ format.
+    // NOTE: this runs on the background thread.
+    private void requestDataFiles(JSONObject objFormat) throws JSONException {
+        // objFormat has the list of data files for the OBJ format (OBJ file, MTL file, textures).
+        // We will use a AsyncFileDownloader to download all those files.
+        mFileDownloader = new AsyncFileDownloader();
+
+        // The "root file" is the OBJ.
+        JSONObject rootFile = objFormat.getJSONObject("root");
+        mFileDownloader.add(rootFile.getString("relativePath"), rootFile.getString("url"));
+
+        // The "resource files" are the MTL file and textures.
+        JSONArray resources = objFormat.getJSONArray("resources");
+        for (int i = 0; i < resources.length(); i++) {
+            JSONObject resourceFile = resources.getJSONObject(i);
+            String path = resourceFile.getString("relativePath");
+            String url = resourceFile.getString("url");
+            // For this example, we only care about OBJ and PNG files.
+            if (path.toLowerCase().endsWith(".obj") || path.toLowerCase().endsWith(".png")) {
+                mFileDownloader.add(path, url);
+            }
+        }
+
+        // Now start downloading the data files. When this is done, the callback will call
+        // processDataFiles().
+        Log.d(TAG, "Starting to download data files, # files: " + mFileDownloader.getEntryCount());
+        mFileDownloader.start(mBackgroundThreadHandler, new AsyncFileDownloader.CompletionListener() {
+            @Override
+            public void onPolyDownloadFinished(AsyncFileDownloader downloader) {
+                if (downloader.isError()) {
+                    Log.e(TAG, "Failed to download data files for asset.");
+                    return;
+                }
+                // Signal to the GL thread that download is complete, so it can go ahead and
+                // import the model.
+                Log.d(TAG, "Download complete, ready to import model.");
+                Toast.makeText(getBaseContext(), "downloading", Toast.LENGTH_LONG).show();
+                mReadyToImport = true;
+            }
+        });
+    }
+
+    // NOTE: this runs on the background thread.
+    private void handleRequestFailure(int statusCode, String message, Exception exception) {
+        // NOTE: because this is a simple sample, we don't have any real error handling logic
+        // other than just printing the error. In an actual app, this is where you would take
+        // appropriate action according to your app's use case. You could, for example, surface
+        // the error to the user or retry the request later.
+        Log.e(TAG, "Request failed. Status code " + statusCode + ", message: " + message +
+                ((exception != null) ? ", exception: " + exception : ""));
+        if (exception != null) exception.printStackTrace();
+    }
+
+    private void showAttributionToast() {
+        mShowedAttributionToast = true;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // NOTE: we use a toast for showing attribution in this sample because it's the
+                // simplest way to accomplish this. In your app, you are not required to use
+                // a toast. You can display this attribution information in the most appropriate
+                // way for your application.
+                Toast.makeText(objectAR.this, mAttributionText, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }
+

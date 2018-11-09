@@ -37,6 +37,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -262,19 +263,27 @@ public class bottomAppBar extends AppCompatActivity
                 .setMessage("Which would you like to do?")
                 .setPositiveButton(R.string.AR_DRAW, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent arPage = new Intent(bottomAppBar.this, objectAR.class);
-                        startActivity(arPage);
+                        Intent arDraw = new Intent(bottomAppBar.this, DrawAR.class);
+                        startActivity(arDraw);
                     }
                 })
                 .setNegativeButton(R.string.IMAGE_CAPTURE, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
                         openCameraIntent();
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                .setNeutralButton(R.string.AR_PLACE, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        Intent arPlace = new Intent(bottomAppBar.this, objectAR.class);
+                        startActivity(arPlace);
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert);
+        AlertDialog alert = builder.create();
+        alert.show();
     }
+
     public void onClickShare(View v) {
         Intent myIntent = new Intent(Intent.ACTION_SEND);
         myIntent.setType("text/plain");

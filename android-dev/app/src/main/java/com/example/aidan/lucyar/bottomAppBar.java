@@ -275,7 +275,7 @@ public class bottomAppBar extends AppCompatActivity
                 .setNeutralButton(R.string.AR_PLACE, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        Intent arPlace = new Intent(bottomAppBar.this, objectAR.class);
+                        Intent arPlace = new Intent(bottomAppBar.this, Sceneform.class);
                         startActivity(arPlace);
                     }
                 })

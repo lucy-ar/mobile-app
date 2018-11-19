@@ -439,7 +439,7 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
                 AsyncFileDownloader.Entry thisEntry = mFileDownloader.getEntry(i);
                 if (thisEntry.fileName.toLowerCase().endsWith(".obj")) {
                     objBytes = thisEntry.contents;
-                } else if (thisEntry.fileName.toLowerCase().endsWith(".png")) {
+                } else if (thisEntry.fileName.toLowerCase().endsWith(".png") || thisEntry.fileName.toLowerCase().endsWith(".jpg")) {
                     textureBytes = thisEntry.contents;
                 }
             }

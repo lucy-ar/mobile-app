@@ -52,6 +52,7 @@ dependencies {
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.5.1'
     implementation 'de.javagl:obj:0.2.1'
+    implementation 'com.github.arimorty:floatingsearchview:2.1.1'
 
 
 }
@@ -82,3 +83,48 @@ sceneform.asset('sampledata/Table_01.obj',
         'default',
         'sampledata/Table_01.sfa',
         'src/main/assets/Table_01')
+
+sceneform.asset('sampledata/Bed_01.obj',
+        'default',
+        'sampledata/Bed_01.sfa',
+        'src/main/assets/Bed_01')
+
+sceneform.asset('sampledata/lamp.obj',
+        'default',
+        'sampledata/lamp.sfa',
+        'src/main/assets/lamp')
+
+sceneform.asset('sampledata/Oven_01.obj',
+        'default',
+        'sampledata/Oven_01.sfa',
+        'src/main/assets/Oven_01')
+
+sceneform.asset('sampledata/pillow.obj',
+        'default',
+        'sampledata/pillow.sfa',
+        'src/main/assets/pillow')
+
+sceneform.asset('sampledata/Bed.obj',
+        'default',
+        'sampledata/Bed.sfa',
+        'src/main/assets/Bed')
+
+sceneform.asset('sampledata/Bedroom.obj',
+        'default',
+        'sampledata/Bedroom.sfa',
+        'src/main/assets/Bedroom')
+
+sceneform.asset('sampledata/Crib.obj',
+        'default',
+        'sampledata/Crib.sfa',
+        'src/main/assets/Crib')
+
+sceneform.asset('sampledata/Refrigerator_01.obj',
+        'default',
+        'sampledata/Refrigerator_01.sfa',
+        'src/main/assets/Refrigerator_01')
+
+sceneform.asset('sampledata/model.obj',
+        'default',
+        'sampledata/model.sfa',
+        'src/main/assets/model')

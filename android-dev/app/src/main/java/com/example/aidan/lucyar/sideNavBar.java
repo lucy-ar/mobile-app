@@ -42,19 +42,19 @@ public class sideNavBar extends AppCompatActivity {
             }
         });
 
-        Button shareButton = (Button) findViewById(R.id.share);
-        shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               Intent myIntent = new Intent(Intent.ACTION_SEND);
-               myIntent.setType("text/plain");
-               String shareBody = "Your body here";
-               String shareSub = "Your Subject here";
-               myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
-               myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-               startActivity(Intent.createChooser(myIntent, "Share using"));
-            }
-        });
+//        Button shareButton = (Button) findViewById(R.id.share);
+//        shareButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//               Intent myIntent = new Intent(Intent.ACTION_SEND);
+//               myIntent.setType("text/plain");
+//               String shareBody = "Your body here";
+//               String shareSub = "Your Subject here";
+//               myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+//               myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+//               startActivity(Intent.createChooser(myIntent, "Share using"));
+//            }
+//        });
     }
     public void changeFragment(Fragment fragment) {
         fragmentManager = getSupportFragmentManager();

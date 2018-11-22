@@ -21,6 +21,13 @@
     android:id="@+id/content"
     tools:context="com.example.aidan.lucyar.drawar.DrawAR">
 
+    <com.arlib.floatingsearchview.FloatingSearchView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+    </com.arlib.floatingsearchview.FloatingSearchView>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

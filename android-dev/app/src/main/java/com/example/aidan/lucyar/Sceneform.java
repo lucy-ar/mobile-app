@@ -1,13 +1,24 @@
 package com.example.aidan.lucyar;
 
+import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
@@ -23,9 +34,11 @@ import com.google.ar.sceneform.ux.TransformableNode;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class Sceneform extends AppCompatActivity {
+public class Sceneform extends AppCompatActivity implements BaseFrag.BaseFragmentCallbacks, NavigationView.OnNavigationItemSelectedListener {
     private ArFragment fragment;
+    private DrawerLayout drawerLayout;
     private PointerDrawable pointer = new PointerDrawable();
+    private FloatingSearchView mSearchView;
     private boolean isTracking;
     private boolean isHitting;
 
@@ -33,6 +46,22 @@ public class Sceneform extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sceneform);
+        Window w = getWindow(); // in Activity's onCreate() for instance
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.sceneform_drawer);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.sceneform_nav);
+        navigationView.setNavigationItemSelectedListener(this);
+        mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
+        onAttachSearchViewToDrawer(mSearchView);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingAction);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         fragment = (ArFragment)
                 getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
@@ -40,6 +69,9 @@ public class Sceneform extends AppCompatActivity {
             onUpdate();
         });
         initializeGallery();
+//        setFullscreen(false);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     private void onUpdate() {
@@ -97,31 +129,31 @@ public class Sceneform extends AppCompatActivity {
     }
 
     private void initializeGallery() {
-        LinearLayout gallery = findViewById(R.id.gallery_layout);
-
-        ImageView chair = new ImageView(this);
-        chair.setImageResource(R.drawable.chair_thumb);
-        chair.setContentDescription("chair");
-        chair.setOnClickListener(view ->{addObject(Uri.parse("CHAHIN_WOODEN_CHAIR.sfb"));});
-        gallery.addView(chair);
-
-        ImageView desk = new ImageView(this);
-        desk.setImageResource(R.drawable.desk_thumb);
-        desk.setContentDescription("desk");
-        desk.setOnClickListener(view ->{addObject(Uri.parse("Desk.sfb"));});
-        gallery.addView(desk);
-
-        ImageView table = new ImageView(this);
-        table.setImageResource(R.drawable.table_thumb);
-        table.setContentDescription("table");
-        table.setOnClickListener(view ->{addObject(Uri.parse("Table_01.sfb"));});
-        gallery.addView(table);
-
-        ImageView couch = new ImageView(this);
-        couch.setImageResource(R.drawable.couch_thumb);
-        couch.setContentDescription("couch");
-        couch.setOnClickListener(view ->{addObject(Uri.parse("Couch.sfb"));});
-        gallery.addView(couch);
+//        LinearLayout gallery = findViewById(R.id.gallery_layout);
+//
+//        ImageView chair = new ImageView(this);
+//        chair.setImageResource(R.drawable.fridge);
+//        chair.setContentDescription("chair");
+//        chair.setOnClickListener(view ->{addObject(Uri.parse("Refrigerator_01.sfb"));});
+//        gallery.addView(chair);
+//
+//        ImageView desk = new ImageView(this);
+//        desk.setImageResource(R.drawable.desk);
+//        desk.setContentDescription("desk");
+//        desk.setOnClickListener(view ->{addObject(Uri.parse("Desk.sfb"));});
+//        gallery.addView(desk);
+//
+//        ImageView table = new ImageView(this);
+//        table.setImageResource(R.drawable.table);
+//        table.setContentDescription("table");
+//        table.setOnClickListener(view ->{addObject(Uri.parse("Table_01.sfb"));});
+//        gallery.addView(table);
+//
+//        ImageView couch = new ImageView(this);
+//        couch.setImageResource(R.drawable.sofa);
+//        couch.setContentDescription("couch");
+//        couch.setOnClickListener(view ->{addObject(Uri.parse("Couch.sfb"));});
+//        gallery.addView(couch);
     }
 
     private void addObject(Uri model) {
@@ -167,4 +199,47 @@ public class Sceneform extends AppCompatActivity {
         node.select();
     }
 
+    @Override
+    public void onAttachSearchViewToDrawer(FloatingSearchView searchView) {
+        drawerLayout = (DrawerLayout) findViewById(R.id.sceneform_drawer);
+        searchView.attachNavigationDrawerToMenuButton(drawerLayout);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+//            case R.id.share:
+//                Intent myIntent = new Intent(Intent.ACTION_SEND);
+//                myIntent.setType("text/plain");
+//                String shareBody = "Your body here";
+//                String shareSub = "Your Subject here";
+//                myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+//                myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+//                startActivity(Intent.createChooser(myIntent, "Share using"));
+//                break;
+            case R.id.login:
+                Intent loginPage = new Intent(Sceneform.this, LoginActivity.class);
+                startActivity(loginPage);
+                break;
+            case R.id.gallery:
+                break;
+            case R.id.settings:
+                break;
+        }
+        return true;
+    }
+
+    private void setFullscreen(boolean fullscreen)
+    {
+        WindowManager.LayoutParams attrs = getWindow().getAttributes();
+        if (fullscreen)
+        {
+            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        }
+        else
+        {
+            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        }
+        getWindow().setAttributes(attrs);
+    }
 }

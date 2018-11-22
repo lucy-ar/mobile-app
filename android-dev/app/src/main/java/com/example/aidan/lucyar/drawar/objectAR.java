@@ -75,7 +75,7 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
     private static final String TAG = objectAR.class.getSimpleName();
 
     // The asset ID to download and display.
-    private static final String ASSET_ID = "fnTN9aw1q25";
+    private static final String ASSET_ID = "88nXdqyGV06";
 
     // Scale factor to apply to asset when displaying.
     private static final float ASSET_SCALE = 0.8f;
@@ -439,8 +439,11 @@ public class objectAR extends AppCompatActivity implements GLSurfaceView.Rendere
                 AsyncFileDownloader.Entry thisEntry = mFileDownloader.getEntry(i);
                 if (thisEntry.fileName.toLowerCase().endsWith(".obj")) {
                     objBytes = thisEntry.contents;
-                } else if (thisEntry.fileName.toLowerCase().endsWith(".png") || thisEntry.fileName.toLowerCase().endsWith(".jpg")) {
+                } else if (thisEntry.fileName.toLowerCase().endsWith(".png")) {
                     textureBytes = thisEntry.contents;
+                } else if (thisEntry.fileName.toLowerCase().endsWith(".jpg")) {
+                    textureBytes = thisEntry.contents;
+
                 }
             }
 

@@ -295,38 +295,38 @@ public class bottomAppBar extends AppCompatActivity
     }
 
     public void changeNav (){
-        NavigationView sideNav = (NavigationView) findViewById(R.id.navigation_view);
-        sideNav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.share:
-                        Intent myIntent = new Intent(Intent.ACTION_SEND);
-                        myIntent.setType("text/plain");
-                        String shareBody = "Your body here";
-                        String shareSub = "Your Subject here";
-                        myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
-                        myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-                        startActivity(Intent.createChooser(myIntent, "Share using"));
-                        break;
-                    case R.id.profile:
-                        Fragment profilePage = new ProfilePage();
-                        drawerLayout.closeDrawers();
-                        changeFragment(profilePage);
-                        break;
-                    case R.id.search:
-                        Fragment searchPage = new SearchPage();
-                        drawerLayout.closeDrawers();
-                        changeFragment(searchPage);
-                        break;
-                    case R.id.settings:
-                        Fragment settingsPage = new SettingsPage();
-                        drawerLayout.closeDrawers();
-                        changeFragment(settingsPage);
-                        break;
-                }
-                return true;
-            }
-        });
+//        NavigationView sideNav = (NavigationView) findViewById(R.id.navigation_view);
+//        sideNav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+//                switch (menuItem.getItemId()) {
+//                    case R.id.share:
+//                        Intent myIntent = new Intent(Intent.ACTION_SEND);
+//                        myIntent.setType("text/plain");
+//                        String shareBody = "Your body here";
+//                        String shareSub = "Your Subject here";
+//                        myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
+//                        myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+//                        startActivity(Intent.createChooser(myIntent, "Share using"));
+//                        break;
+//                    case R.id.profile:
+//                        Fragment profilePage = new ProfilePage();
+//                        drawerLayout.closeDrawers();
+//                        changeFragment(profilePage);
+//                        break;
+//                    case R.id.search:
+//                        Fragment searchPage = new SearchPage();
+//                        drawerLayout.closeDrawers();
+//                        changeFragment(searchPage);
+//                        break;
+//                    case R.id.settings:
+//                        Fragment settingsPage = new SettingsPage();
+//                        drawerLayout.closeDrawers();
+//                        changeFragment(settingsPage);
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
     }
 }

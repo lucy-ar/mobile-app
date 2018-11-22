@@ -48,7 +48,7 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundLayerName" value="search_icon_background" />
-                                      <entry key="foregroundImage" value="C:\Users\Dell\Desktop\baseline-account_circle-24px.svg" />
+                                      <entry key="foregroundImage" value="C:\Users\Benjamin\Documents\QTMA\lucy\android-dev\app\src\main\res\drawable\small_grey.png" />
                                       <entry key="foregroundLayerName" value="profile" />
                                       <entry key="outputName" value="profile_icon" />
                                     </map>
@@ -82,6 +82,24 @@
                                 </PersistentState>
                               </value>
                             </entry>
+                            <entry key="notification">
+                              <value>
+                                <PersistentState>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="C:\Users\Benjamin\Documents\QTMA\lucy\android-dev\app\src\main\res\drawable\small_grey.png" />
+                                      <entry key="outputName" value="circle_shit" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="outputIconType" value="NOTIFICATION" />
                           </map>
                         </option>
                       </PersistentState>

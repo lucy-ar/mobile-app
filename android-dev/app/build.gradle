@@ -53,7 +53,8 @@ dependencies {
     implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.5.1'
     implementation 'de.javagl:obj:0.2.1'
     implementation 'com.github.arimorty:floatingsearchview:2.1.1'
-
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.lapism:searchview:27.1.1.0.0'
 
 }
 

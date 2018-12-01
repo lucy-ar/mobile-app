@@ -6,16 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".Sceneform"
     android:id="@+id/sceneform_drawer">
-
     <fragment
         android:id="@+id/sceneform_fragment"
         android:name="com.google.ar.sceneform.ux.ArFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-        <!--app:layout_constraintTop_toTopOf="parent"-->
-        <!--app:layout_constraintBottom_toTopOf="@id/gallery_layout"-->
-        <!--app:layout_constraintVertical_chainStyle="spread"-->
-        <!--app:layout_constraintVertical_weight="9"/>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <com.lapism.searchview.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            app:search_version_margins="menu_item"
+            app:search_background_color="@color/transparent"
+            app:search_text_color="@color/white"
+            app:search_menu_color="@color/white"
+            app:search_logo_color="@color/white"
+            app:search_hint_color="@color/white"
+            app:search_hint="Search"
+            app:search_elevation="0dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="?android:attr/listDivider"/>
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/gallery_layout"
         android:layout_width="match_parent"
@@ -36,41 +54,7 @@
             android:backgroundTint="@color/transparent"
             android:scaleType="center"
             app:fabCustomSize="72dp" />
-        <!--<HorizontalScrollView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="bottom|center_horizontal">-->
-            <!--<LinearLayout-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal">-->
-                <!--<Button-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="@string/AR_DRAW"/>-->
-                <!--<Button-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="@string/AR_PLACE"/>-->
-            <!--</LinearLayout>-->
-        <!--</HorizontalScrollView>-->
     </LinearLayout>
-
-
-    <com.arlib.floatingsearchview.FloatingSearchView
-        android:id="@+id/floating_search_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:floatingSearch_close_search_on_keyboard_dismiss="false"
-        app:floatingSearch_dimBackground="false"
-        app:floatingSearch_dismissOnOutsideTouch="true"
-        app:floatingSearch_leftActionMode="showHamburger"
-        app:floatingSearch_searchBarMarginLeft="5dp"
-        app:floatingSearch_searchBarMarginRight="5dp"
-        app:floatingSearch_searchBarMarginTop="23dp"
-        app:floatingSearch_searchHint="Search..."
-        app:floatingSearch_showSearchKey="true"
-        app:floatingSearch_suggestionsListAnimDuration="250"/>
 
 
     <android.support.design.widget.NavigationView

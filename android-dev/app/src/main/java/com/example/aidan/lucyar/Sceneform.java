@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,10 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-
-import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
@@ -30,48 +25,39 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.lapism.searchview.Search;
+import com.lapism.searchview.database.SearchHistoryTable;
+import com.lapism.searchview.widget.SearchAdapter;
+import com.lapism.searchview.widget.SearchItem;
+import com.lapism.searchview.widget.SearchView;
 
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class Sceneform extends AppCompatActivity implements BaseFrag.BaseFragmentCallbacks, NavigationView.OnNavigationItemSelectedListener {
+public class Sceneform extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ArFragment fragment;
     private DrawerLayout drawerLayout;
     private PointerDrawable pointer = new PointerDrawable();
-    private FloatingSearchView mSearchView;
+    private SearchView searchView;
     private boolean isTracking;
     private boolean isHitting;
+    private SearchItem suggestion;
+    private List<SearchItem> suggestions;
+    private SearchAdapter searchAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sceneform);
-        Window w = getWindow(); // in Activity's onCreate() for instance
-        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-
-        drawerLayout = (DrawerLayout) findViewById(R.id.sceneform_drawer);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.sceneform_nav);
-        navigationView.setNavigationItemSelectedListener(this);
-        mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
-        onAttachSearchViewToDrawer(mSearchView);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingAction);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        fragment = (ArFragment)
-                getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
-        fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
-            fragment.onUpdate(frameTime);
-            onUpdate();
-        });
-        initializeGallery();
-//        setFullscreen(false);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        toTheWindow();
+        tooManySideNavs();
+        FABulous();
+        setupData();
+        setupSearch();
+        ARyouSure();
+        toTheWall();
     }
 
     private void onUpdate() {
@@ -128,34 +114,6 @@ public class Sceneform extends AppCompatActivity implements BaseFrag.BaseFragmen
         return new android.graphics.Point(vw.getWidth()/2, vw.getHeight()/2);
     }
 
-    private void initializeGallery() {
-//        LinearLayout gallery = findViewById(R.id.gallery_layout);
-//
-//        ImageView chair = new ImageView(this);
-//        chair.setImageResource(R.drawable.fridge);
-//        chair.setContentDescription("chair");
-//        chair.setOnClickListener(view ->{addObject(Uri.parse("Refrigerator_01.sfb"));});
-//        gallery.addView(chair);
-//
-//        ImageView desk = new ImageView(this);
-//        desk.setImageResource(R.drawable.desk);
-//        desk.setContentDescription("desk");
-//        desk.setOnClickListener(view ->{addObject(Uri.parse("Desk.sfb"));});
-//        gallery.addView(desk);
-//
-//        ImageView table = new ImageView(this);
-//        table.setImageResource(R.drawable.table);
-//        table.setContentDescription("table");
-//        table.setOnClickListener(view ->{addObject(Uri.parse("Table_01.sfb"));});
-//        gallery.addView(table);
-//
-//        ImageView couch = new ImageView(this);
-//        couch.setImageResource(R.drawable.sofa);
-//        couch.setContentDescription("couch");
-//        couch.setOnClickListener(view ->{addObject(Uri.parse("Couch.sfb"));});
-//        gallery.addView(couch);
-    }
-
     private void addObject(Uri model) {
         Frame frame = fragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
@@ -200,12 +158,6 @@ public class Sceneform extends AppCompatActivity implements BaseFrag.BaseFragmen
     }
 
     @Override
-    public void onAttachSearchViewToDrawer(FloatingSearchView searchView) {
-        drawerLayout = (DrawerLayout) findViewById(R.id.sceneform_drawer);
-        searchView.attachNavigationDrawerToMenuButton(drawerLayout);
-    }
-
-    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
 //            case R.id.share:
@@ -229,17 +181,124 @@ public class Sceneform extends AppCompatActivity implements BaseFrag.BaseFragmen
         return true;
     }
 
-    private void setFullscreen(boolean fullscreen)
-    {
-        WindowManager.LayoutParams attrs = getWindow().getAttributes();
-        if (fullscreen)
-        {
-            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-        }
-        else
-        {
-            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
-        }
-        getWindow().setAttributes(attrs);
+    public void setupData() {
+        suggestions = new ArrayList<>();
+
+        suggestion = new SearchItem(this);
+        suggestion.setTitle("Chair");
+        suggestion.setIcon1Resource(R.drawable.wooden_chair);
+        suggestion.setSubtitle("CHAHIN_WOODEN_CHAIR.sfb");
+        suggestions.add(suggestion);
+
+        suggestion = new SearchItem(this);
+        suggestion.setTitle("Desk");
+        suggestion.setIcon1Resource(R.drawable.desk);
+        suggestion.setSubtitle("Desk.sfb");
+        suggestions.add(suggestion);
+
+        suggestion = new SearchItem(this);
+        suggestion.setTitle("Lamp");
+        suggestion.setIcon1Resource(R.drawable.desk);
+        suggestion.setSubtitle("lamp.sfb");
+        suggestions.add(suggestion);
     }
+
+    public void setupSearch() {
+        searchView = (SearchView) findViewById(R.id.searchView);
+        final SearchHistoryTable mHistoryDatabase = new SearchHistoryTable(this);
+
+        searchAdapter = new SearchAdapter(this);
+        searchAdapter.setSuggestionsList(suggestions);
+        searchAdapter.setOnSearchItemClickListener(new SearchAdapter.OnSearchItemClickListener() {
+            @Override
+            public void onSearchItemClick(int position, CharSequence title, CharSequence subtitle) {
+                SearchItem item = new SearchItem(Sceneform.this);
+                item.setTitle(title);
+                item.setSubtitle(subtitle);
+
+                addObject(Uri.parse(subtitle.toString()));
+
+                searchView.setText(title.toString());
+                mHistoryDatabase.addItem(item);
+            }
+        });
+
+        searchView.setAdapter(searchAdapter);
+        searchView.setOnQueryTextListener(new Search.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(CharSequence query) {
+                SearchItem item = new SearchItem(Sceneform.this);
+                item.setTitle(query);
+
+                mHistoryDatabase.addItem(item);
+                return true;
+            }
+
+            @Override
+            public void onQueryTextChange(CharSequence newText) {
+            }
+        });
+
+        searchView.setOnOpenCloseListener(new Search.OnOpenCloseListener() {
+            @Override
+            public void onOpen() {
+                searchView.setBackgroundColor(getColor(R.color.white));
+                searchView.setLogoColor(getColor(R.color.gray));
+                searchView.setTextColor(getColor(R.color.gray));
+                searchView.setHintColor(getColor(R.color.gray));
+                searchView.setText("");
+            }
+
+            @Override
+            public void onClose() {
+                searchView.setBackgroundColor(getColor(R.color.transparent));
+                searchView.setLogoColor(getColor(R.color.white));
+                searchView.setTextColor(getColor(R.color.white));
+                searchView.setHintColor(getColor(R.color.white));
+            }
+        });
+
+        searchView.setOnLogoClickListener(new Search.OnLogoClickListener() {
+            @Override
+            public void onLogoClick() {
+                drawerLayout.openDrawer(Gravity.START);
+            }
+        });
+    }
+
+    public void FABulous() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingAction);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+    public void tooManySideNavs() {
+        drawerLayout = (DrawerLayout) findViewById(R.id.sceneform_drawer);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.sceneform_nav);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    public void toTheWindow() {
+        Window w = getWindow(); // in Activity's onCreate() for instance
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+    }
+
+    public void toTheWall() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
+    public void ARyouSure() {
+        fragment = (ArFragment)
+                getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
+        fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
+            fragment.onUpdate(frameTime);
+            onUpdate();
+        });
+    }
+
 }

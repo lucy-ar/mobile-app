@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,12 @@ import com.lapism.searchview.widget.SearchItem;
 import com.lapism.searchview.widget.SearchView;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -184,23 +191,38 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     public void setupData() {
         suggestions = new ArrayList<>();
 
-        suggestion = new SearchItem(this);
-        suggestion.setTitle("Chair");
-        suggestion.setIcon1Resource(R.drawable.wooden_chair);
-        suggestion.setSubtitle("CHAHIN_WOODEN_CHAIR.sfb");
-        suggestions.add(suggestion);
+        try {
+            JSONArray furnitureArray = new JSONArray(loadJSONFromAsset());
+            for (int i = 0; i < furnitureArray.length(); i++) {
+                suggestion = new SearchItem(this);
+                JSONObject params = furnitureArray.getJSONObject(i);
+                suggestion.setTitle(params.getString("furniture"));
+                suggestion.setSubtitle(params.getString("sfb_file"));
+                suggestions.add(suggestion);
+            }
 
-        suggestion = new SearchItem(this);
-        suggestion.setTitle("Desk");
-        suggestion.setIcon1Resource(R.drawable.desk);
-        suggestion.setSubtitle("Desk.sfb");
-        suggestions.add(suggestion);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d("huh", "setupData: ");
+        }
 
-        suggestion = new SearchItem(this);
-        suggestion.setTitle("Lamp");
-        suggestion.setIcon1Resource(R.drawable.desk);
-        suggestion.setSubtitle("lamp.sfb");
-        suggestions.add(suggestion);
+//        suggestion = new SearchItem(this);
+//        suggestion.setTitle("Chair");
+//        suggestion.setIcon1Resource(R.drawable.wooden_chair);
+//        suggestion.setSubtitle("CHAHIN_WOODEN_CHAIR.sfb");
+//        suggestions.add(suggestion);
+//
+//        suggestion = new SearchItem(this);
+//        suggestion.setTitle("Desk");
+//        suggestion.setIcon1Resource(R.drawable.desk);
+//        suggestion.setSubtitle("Desk.sfb");
+//        suggestions.add(suggestion);
+//
+//        suggestion = new SearchItem(this);
+//        suggestion.setTitle("Lamp");
+//        suggestion.setIcon1Resource(R.drawable.wooden_chair);
+//        suggestion.setSubtitle("lamp.sfb");
+//        suggestions.add(suggestion);
     }
 
     public void setupSearch() {
@@ -299,6 +321,23 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
             fragment.onUpdate(frameTime);
             onUpdate();
         });
+    }
+
+    public String loadJSONFromAsset() {
+        String json = null;
+        try {
+            InputStream is = this.getAssets().open("data.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            Log.d("huh", "loadJSONFromAsset: ");
+            return null;
+        }
+        return json;
     }
 
 }

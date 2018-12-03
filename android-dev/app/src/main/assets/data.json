@@ -1,0 +1,50 @@
+[
+  {
+    "furniture" : "Single bed",
+    "sfb_file" : "Bed_01.sfb"
+  },
+  {
+    "furniture" : "Queen sized bed",
+    "sfb_file" : "Bed.sfb"
+  },
+  {
+    "furniture" : "Chair",
+    "sfb_file" : "CHAHIN_WOODEN_CHAIR.sfb"
+  },
+  {
+    "furniture" : "Couch",
+    "sfb_file" : "Couch.sfb"
+  },
+  {
+    "furniture" : "Crib",
+    "sfb_file" : "Crib.sfb"
+  },
+  {
+    "furniture" : "Desk",
+    "sfb_file" : "Desk.sfb"
+  },
+  {
+    "furniture" : "Lamp",
+    "sfb_file" : "lamp.sfb"
+  },
+  {
+    "furniture" : "Two Seat Couch",
+    "sfb_file" : "model.sfb"
+  },
+  {
+    "furniture" : "Oven",
+    "sfb_file" : "Oven_01.sfb"
+  },
+  {
+    "furniture" : "Pillow",
+    "sfb_file" : "pillow.sfb"
+  },
+  {
+    "furniture" : "Refrigerator",
+    "sfb_file" : "Refrigerator_01.sfb"
+  },
+  {
+    "furniture" : "Table",
+    "sfb_file" : "Table_01.sfb"
+  }
+]

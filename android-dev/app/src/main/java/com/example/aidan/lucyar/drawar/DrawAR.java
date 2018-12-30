@@ -42,20 +42,11 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.aidan.lucyar.R;
-import com.example.aidan.lucyar.drawar.helpers.TapHelper;
-import com.example.aidan.lucyar.drawar.rendering.PlaneRenderer;
-import com.example.aidan.lucyar.drawar.rendering.PointCloudRenderer;
-import com.google.ar.core.Anchor;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Camera;
 import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
-import com.google.ar.core.HitResult;
-import com.google.ar.core.Plane;
-import com.google.ar.core.Point;
-import com.google.ar.core.PointCloud;
 import com.google.ar.core.Session;
-import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.core.exceptions.UnavailableApkTooOldException;
@@ -91,8 +82,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
     private Session mSession;
     private BackgroundRenderer mBackgroundRenderer = new BackgroundRenderer();
     private LineShaderRenderer mLineShaderRenderer = new LineShaderRenderer();
-    private final PlaneRenderer planeRenderer = new PlaneRenderer();
-    private final PointCloudRenderer pointCloudRenderer = new PointCloudRenderer();
     private Frame mFrame;
 
     private float[] projmtx = new float[16];
@@ -124,9 +113,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
 
     private float[] mLastFramePosition;
 
-    private TapHelper tapHelper;
-
-
     private AtomicBoolean bIsTracking = new AtomicBoolean(true);
     private AtomicBoolean bReCenterView = new AtomicBoolean(false);
     private AtomicBoolean bTouchDown = new AtomicBoolean(false);
@@ -143,29 +129,9 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
     private boolean bInstallRequested;
 
     private TrackingState mState;
-    private final Object singleTapAnchorLock = new Object();
-    private MotionEvent queuedSingleTap;
     /**
      * Setup the app when main activity is created
      */
-
-    private final float[] anchorMatrix = new float[16];
-    private static final float[] DEFAULT_COLOR = new float[] {0f, 0f, 0f, 0f};
-
-
-    // Anchors created from taps used for object placing with a given color.
-    private static class ColoredAnchor {
-        public final Anchor anchor;
-        public final float[] color;
-
-        public ColoredAnchor(Anchor a, float[] color4f) {
-            this.anchor = a;
-            this.color = color4f;
-        }
-    }
-
-    private final ArrayList<DrawAR.ColoredAnchor> anchors = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,11 +142,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         mSurfaceView = findViewById(R.id.surfaceview);
         mSettingsUI = findViewById(R.id.strokeUI);
         mButtonBar = findViewById(R.id.button_bar);
-
-
-        tapHelper = new TapHelper(/*context=*/ this);
-        mSurfaceView.setOnTouchListener(tapHelper);
-
 
         // Settings seek bars
         mLineDistanceScaleBar = findViewById(R.id.distanceScale);
@@ -255,38 +216,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         mDetector.setOnDoubleTapListener(this);
         mStrokes = new ArrayList<>();
 
-//
-//        //tina's code
-//
-//        // Set up tap listener.
-//        GestureDetector gestureDetector = new GestureDetector(
-//                this,
-//                new GestureDetector.SimpleOnGestureListener() {
-//                    @Override
-//                    public boolean onSingleTapUp(MotionEvent e) {
-//                        synchronized (singleTapAnchorLock) {
-//                            queuedSingleTap = e;
-//                        }
-//                        return true;
-//                    }
-//
-//                    @Override
-//                    public boolean onDown(MotionEvent e) {
-//                        return true;
-//                    }
-//                });
-//
-//
-//
-//        // Initialize the "Clear" button. Clicking it will clear the current anchor, if it exists.
-//        Button clearButton = findViewById(R.id);
-//        clearButton.setOnClickListener(
-//                (unusedView) -> {
-//                    synchronized (singleTapAnchorLock) {
-//                        setNewAnchor(null);
-//                    }
-//                });
-//        //tina's code ends
 
     }
 
@@ -475,10 +404,8 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         // Create the texture and pass it to ARCore session to be filled during update().
         mBackgroundRenderer.createOnGlThread(/*context=*/this);
 
-
         try {
-            planeRenderer.createOnGlThread(/*context=*/ this, "models/trigrid.png");
-            pointCloudRenderer.createOnGlThread(/*context=*/ this);
+
             mSession.setCameraTextureName(mBackgroundRenderer.getTextureId());
             mLineShaderRenderer.createOnGlThread(this);
 
@@ -539,19 +466,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
 
             float[] position = new float[3];
             camera.getPose().getTranslation(position, 0);
-
-            // Visualize tracked points.
-            PointCloud pointCloud = mFrame.acquirePointCloud();
-            pointCloudRenderer.update(pointCloud);
-            pointCloudRenderer.draw(viewmtx, projmtx);
-
-            // Application is responsible for releasing the point cloud resources after
-            // using it.
-            pointCloud.release();
-
-            // Visualize planes.
-            planeRenderer.drawPlanes(
-                    mSession.getAllTrackables(Plane.class), camera.getDisplayOrientedPose(), projmtx);
 
             // Check if camera has moved much, if thats the case, stop touchDown events
             // (stop drawing lines abruptly through the air)
@@ -641,49 +555,6 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
         }
     }
 
-    // Handle only one tap per frame, as taps are usually low frequency compared to frame rate.
-    private void handleTap(Frame frame, Camera camera) {
-        MotionEvent tap = tapHelper.poll();
-        if (tap != null && camera.getTrackingState() == TrackingState.TRACKING) {
-            for (HitResult hit : frame.hitTest(tap)) {
-                // Check if any plane was hit, and if it was hit inside the plane polygon
-                Trackable trackable = hit.getTrackable();
-                // Creates an anchor if a plane or an oriented point was hit.
-                if ((trackable instanceof Plane
-                        && ((Plane) trackable).isPoseInPolygon(hit.getHitPose())
-                        && (PlaneRenderer.calculateDistanceToPlane(hit.getHitPose(), camera.getPose()) > 0))
-                        || (trackable instanceof Point
-                        && ((Point) trackable).getOrientationMode()
-                        == Point.OrientationMode.ESTIMATED_SURFACE_NORMAL)) {
-                    // Hits are sorted by depth. Consider only closest hit on a plane or oriented point.
-                    // Cap the number of objects created. This avoids overloading both the
-                    // rendering system and ARCore.
-                    if (anchors.size() >= 20) {
-                        anchors.get(0).anchor.detach();
-                        anchors.remove(0);
-                    }
-
-                    // Assign a color to the object for rendering based on the trackable type
-                    // this anchor attached to. For AR_TRACKABLE_POINT, it's blue color, and
-                    // for AR_TRACKABLE_PLANE, it's green color.
-                    float[] objColor;
-                    if (trackable instanceof Point) {
-                        objColor = new float[] {66.0f, 133.0f, 244.0f, 255.0f};
-                    } else if (trackable instanceof Plane) {
-                        objColor = new float[] {139.0f, 195.0f, 74.0f, 255.0f};
-                    } else {
-                        objColor = DEFAULT_COLOR;
-                    }
-
-                    // Adding an Anchor tells ARCore that it should track this position in
-                    // space. This anchor is created on the Plane to place the 3D model
-                    // in the correct position relative both to the world and to the plane.
-                    anchors.add(new DrawAR.ColoredAnchor(hit.createAnchor(), objColor));
-                    break;
-                }
-            }
-        }
-    }
 
     /**
      * Get a matrix usable for zero calibration (only position and compass direction)
@@ -866,7 +737,5 @@ public class DrawAR extends AppCompatActivity implements GLSurfaceView.Renderer,
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         return false;
     }
-
-
 
 }

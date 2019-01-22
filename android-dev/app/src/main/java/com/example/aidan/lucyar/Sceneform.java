@@ -9,7 +9,6 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -24,7 +23,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import com.example.aidan.lucyar.drawar.DrawAR;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
@@ -44,12 +42,9 @@ import com.lapism.searchview.database.SearchHistoryTable;
 import com.lapism.searchview.widget.SearchAdapter;
 import com.lapism.searchview.widget.SearchItem;
 import com.lapism.searchview.widget.SearchView;
-
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
 
 public class Sceneform extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ArFragment fragment;
@@ -219,6 +215,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 suggestion.setTitle(params.getString("furniture"));
                 suggestion.setSubtitle(params.getString("sfb_file"));
                 suggestions.add(suggestion);
+
             }
 
         } catch (JSONException e) {
@@ -226,23 +223,6 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
             Log.d("huh", "setupData: ");
         }
 
-//        suggestion = new SearchItem(this);
-//        suggestion.setTitle("Chair");
-//        suggestion.setIcon1Resource(R.drawable.wooden_chair);
-//        suggestion.setSubtitle("CHAHIN_WOODEN_CHAIR.sfb");
-//        suggestions.add(suggestion);
-//
-//        suggestion = new SearchItem(this);
-//        suggestion.setTitle("Desk");
-//        suggestion.setIcon1Resource(R.drawable.desk);
-//        suggestion.setSubtitle("Desk.sfb");
-//        suggestions.add(suggestion);
-//
-//        suggestion = new SearchItem(this);
-//        suggestion.setTitle("Lamp");
-//        suggestion.setIcon1Resource(R.drawable.wooden_chair);
-//        suggestion.setSubtitle("lamp.sfb");
-//        suggestions.add(suggestion);
     }
 
     public void setupSearch() {
@@ -257,9 +237,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 SearchItem item = new SearchItem(Sceneform.this);
                 item.setTitle(title);
                 item.setSubtitle(subtitle);
-
                 addObject(Uri.parse(subtitle.toString()));
-
                 searchView.setText(title.toString());
                 mHistoryDatabase.addItem(item);
             }
@@ -271,11 +249,9 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
             public boolean onQueryTextSubmit(CharSequence query) {
                 SearchItem item = new SearchItem(Sceneform.this);
                 item.setTitle(query);
-
                 mHistoryDatabase.addItem(item);
                 return true;
             }
-
             @Override
             public void onQueryTextChange(CharSequence newText) {
             }

@@ -24,6 +24,10 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import com.example.aidan.lucyar.drawar.DrawAR;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
@@ -33,10 +37,14 @@ import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.Scene;
+import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.lapism.searchview.Search;
 import com.lapism.searchview.database.SearchHistoryTable;
 import com.lapism.searchview.widget.SearchAdapter;
@@ -47,6 +55,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +64,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -68,11 +79,17 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private List<SearchItem> suggestions;
     private SearchAdapter searchAdapter;
     private ImageButton draw;
+    private FirebaseStorage storage;
+    private StorageReference storageRef;
+    private File gltf;
+    private File bin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sceneform);
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
         toTheWindow();
         tooManySideNavs();
         FABulous();
@@ -137,7 +154,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         return new android.graphics.Point(vw.getWidth()/2, vw.getHeight()/2);
     }
 
-    private void addObject(Uri model) {
+    private void addObject() {
         Frame frame = fragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
         List<HitResult> hits;
@@ -147,28 +164,37 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 Trackable trackable = hit.getTrackable();
                 if (trackable instanceof Plane &&
                         ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    placeObject(fragment, hit.createAnchor(), model);
+                    placeObject(fragment, hit.createAnchor(), Uri.fromFile(gltf));
+                    Log.d("fuck", "second part add object: ");
                     break;
 
                 }
             }
         }
+
     }
 
     private void placeObject(ArFragment fragment, Anchor anchor, Uri model) {
-        CompletableFuture<Void> renderableFuture =
-                ModelRenderable.builder()
-                        .setSource(fragment.getContext(), model)
-                        .build()
-                        .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable))
-                        .exceptionally((throwable -> {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setMessage(throwable.getMessage())
-                                    .setTitle("Codelab error!");
-                            AlertDialog dialog = builder.create();
-                            dialog.show();
-                            return null;
-                        }));
+        ModelRenderable.builder()
+                .setSource(this, RenderableSource.builder().setSource(
+                        this,
+                        model,
+                        RenderableSource.SourceType.GLTF2)
+                        .setScale(1)  // Scale the original model to 50%.
+                        .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                        .build())
+                .setRegistryId(model.toString())
+                .build()
+                .thenAccept(renderable -> addNodeToScene(fragment, anchor, renderable))
+                .exceptionally(
+                throwable -> {
+                    Toast toast =
+                            Toast.makeText(this, "Unable to load renderable " +
+                                    model.toString(), Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                    return null;
+                });
     }
 
     private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable) {
@@ -237,7 +263,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 SearchItem item = new SearchItem(Sceneform.this);
                 item.setTitle(title);
                 item.setSubtitle(subtitle);
-                addObject(Uri.parse(subtitle.toString()));
+                dynamicLoad();
                 searchView.setText(title.toString());
                 mHistoryDatabase.addItem(item);
             }
@@ -421,6 +447,25 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
             }
             handlerThread.quitSafely();
         }, new Handler(handlerThread.getLooper()));
+    }
+
+    public void dynamicLoad() {
+        StorageReference gl = storageRef.child("model.gltf");
+        StorageReference dep = storageRef.child("model.bin");
+        gltf = new File(getCacheDir(), "model.gltf");
+        bin = new File (getCacheDir(), "model.bin");
+        FileDownloadTask asyncGLTF = gl.getFile(gltf);
+        FileDownloadTask asyncBIN = dep.getFile(bin);
+        while (true) {
+            if (asyncBIN.isComplete()) {
+                if(asyncGLTF.isComplete()) {
+                    addObject();
+                    break;
+                }
+            }
+        }
+
+
     }
 
 }

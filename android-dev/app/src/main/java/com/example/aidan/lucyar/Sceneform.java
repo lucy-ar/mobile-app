@@ -50,13 +50,15 @@ import com.lapism.searchview.database.SearchHistoryTable;
 import com.lapism.searchview.widget.SearchAdapter;
 import com.lapism.searchview.widget.SearchItem;
 import com.lapism.searchview.widget.SearchView;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.FileAsyncHttpResponseHandler;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,6 +68,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+
+import retrofit2.http.Header;
+import retrofit2.http.Url;
 
 
 public class Sceneform extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -83,6 +88,9 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private StorageReference storageRef;
     private File gltf;
     private File bin;
+    private String gltfFile = "http://10.0.2.2:5000/models/Bed_01.gltf";
+    private boolean lock_gltf = false;
+    private boolean lock_bin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +162,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         return new android.graphics.Point(vw.getWidth()/2, vw.getHeight()/2);
     }
 
-    private void addObject() {
+    private void addObject(Uri model) {
         Frame frame = fragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
         List<HitResult> hits;
@@ -164,7 +172,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 Trackable trackable = hit.getTrackable();
                 if (trackable instanceof Plane &&
                         ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    placeObject(fragment, hit.createAnchor(), Uri.fromFile(gltf));
+                    placeObject(fragment, hit.createAnchor(), model);
                     Log.d("fuck", "second part add object: ");
                     break;
 
@@ -180,7 +188,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                         this,
                         model,
                         RenderableSource.SourceType.GLTF2)
-                        .setScale(1)  // Scale the original model to 50%.
+                        .setScale(0.01f)  // Scale the original model to 50%.
                         .setRecenterMode(RenderableSource.RecenterMode.ROOT)
                         .build())
                 .setRegistryId(model.toString())
@@ -239,9 +247,8 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 suggestion = new SearchItem(this);
                 JSONObject params = furnitureArray.getJSONObject(i);
                 suggestion.setTitle(params.getString("furniture"));
-                suggestion.setSubtitle(params.getString("sfb_file"));
+                suggestion.setSubtitle(params.getString("gltf_file"));
                 suggestions.add(suggestion);
-
             }
 
         } catch (JSONException e) {
@@ -263,7 +270,8 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 SearchItem item = new SearchItem(Sceneform.this);
                 item.setTitle(title);
                 item.setSubtitle(subtitle);
-                dynamicLoad();
+//                dynamicLoad("Bed_01");
+                addObject(Uri.parse(subtitle.toString()));
                 searchView.setText(title.toString());
                 mHistoryDatabase.addItem(item);
             }
@@ -415,21 +423,6 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                     toast.show();
                     return;
                 }
-//                Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content),
-//                        "Photo saved", Snackbar.LENGTH_LONG);
-//                snackbar.setAction("Open in Photos", v -> {
-//                    File photoFile = new File(filename);
-//
-//                    Uri photoURI = FileProvider.getUriForFile(Sceneform.this,
-//                            Sceneform.this.getPackageName() + ".ar.codelab.name.provider",
-//                            photoFile);
-//                    Intent intent = new Intent(Intent.ACTION_VIEW, photoURI);
-//                    intent.setDataAndType(photoURI, "image/*");
-//                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                    startActivity(intent);
-//
-//                });
-//                snackbar.show();
 
                 File photoFile = new File(filename);
 
@@ -448,24 +441,4 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
             handlerThread.quitSafely();
         }, new Handler(handlerThread.getLooper()));
     }
-
-    public void dynamicLoad() {
-        StorageReference gl = storageRef.child("model.gltf");
-        StorageReference dep = storageRef.child("model.bin");
-        gltf = new File(getCacheDir(), "model.gltf");
-        bin = new File (getCacheDir(), "model.bin");
-        FileDownloadTask asyncGLTF = gl.getFile(gltf);
-        FileDownloadTask asyncBIN = dep.getFile(bin);
-        while (true) {
-            if (asyncBIN.isComplete()) {
-                if(asyncGLTF.isComplete()) {
-                    addObject();
-                    break;
-                }
-            }
-        }
-
-
-    }
-
 }

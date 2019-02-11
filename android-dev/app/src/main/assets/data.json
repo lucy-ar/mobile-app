@@ -1,50 +1,34 @@
 [
   {
-    "furniture" : "Single bed",
-    "sfb_file" : "Bed_01.sfb"
+    "furniture" : "Dishwasher",
+    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Dishwasher.gltf"
   },
   {
-    "furniture" : "Queen sized bed",
-    "sfb_file" : "Bed.sfb"
+    "furniture" : "Roomba",
+    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/DomesticRobot_1293.gltf"
   },
   {
-    "furniture" : "Chair",
-    "sfb_file" : "CHAHIN_WOODEN_CHAIR.sfb"
+    "furniture" : "Easel",
+    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Easel.gltf"
   },
   {
-    "furniture" : "Couch",
-    "sfb_file" : "Couch.sfb"
-  },
-  {
-    "furniture" : "Crib",
-    "sfb_file" : "Crib.sfb"
-  },
-  {
-    "furniture" : "Desk",
-    "sfb_file" : "Desk.sfb"
-  },
-  {
-    "furniture" : "Lamp",
-    "sfb_file" : "lamp.sfb"
-  },
-  {
-    "furniture" : "Two Seat Couch",
-    "sfb_file" : "model.sfb"
-  },
-  {
-    "furniture" : "Oven",
-    "sfb_file" : "Oven_01.sfb"
-  },
-  {
-    "furniture" : "Pillow",
-    "sfb_file" : "pillow.sfb"
+    "furniture" : "Stereo",
+    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Hi-fi%20stereo.gltf"
   },
   {
     "furniture" : "Refrigerator",
-    "sfb_file" : "Refrigerator_01.sfb"
+    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Refrigerator_01.gltf"
   },
   {
-    "furniture" : "Table",
-    "sfb_file" : "Table_01.sfb"
+    "furniture" : "Stool",
+    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Stool_01.gltf"
+  },
+  {
+    "furniture" : "TV",
+    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/TV_01.gltf"
+  },
+  {
+    "furniture" : "Couch",
+    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/couch.gltf"
   }
 ]

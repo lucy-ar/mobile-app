@@ -69,9 +69,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
-import retrofit2.http.Header;
-import retrofit2.http.Url;
-
 
 public class Sceneform extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ArFragment fragment;

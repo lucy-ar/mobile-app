@@ -49,7 +49,6 @@
             android:name="com.google.ar.core"
             android:value="optional" />
 
-        <activity android:name=".bottomAppBar" />
         <activity
             android:name=".drawar.DrawAR"
             android:label="ar draw" />

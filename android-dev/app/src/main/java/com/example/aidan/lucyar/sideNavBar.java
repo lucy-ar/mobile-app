@@ -22,7 +22,6 @@ public class sideNavBar extends AppCompatActivity {
     private Uri mImageUri;
     private ImageView imageView;
     private String imageFilePath = "";
-    private AzureWrapper azureWrapper;
     private Bitmap imageCapture;
     private TextView classification;
     private DrawerLayout drawerLayout;

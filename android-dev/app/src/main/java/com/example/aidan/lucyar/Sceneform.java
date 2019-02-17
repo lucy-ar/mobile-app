@@ -88,6 +88,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private String gltfFile = "http://10.0.2.2:5000/models/Bed_01.gltf";
     private boolean lock_gltf = false;
     private boolean lock_bin = false;
+    private static String BASE_URL = "https://github.com/lucy-ar/models/raw/master/renderables/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,7 +186,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                         this,
                         model,
                         RenderableSource.SourceType.GLTF2)
-                        .setScale(0.01f)  // Scale the original model to 50%.
+//                        .setScale(0.01f)  // Scale the original model to 50%.
                         .setRecenterMode(RenderableSource.RecenterMode.ROOT)
                         .build())
                 .setRegistryId(model.toString())
@@ -268,7 +269,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 item.setTitle(title);
                 item.setSubtitle(subtitle);
 //                dynamicLoad("Bed_01");
-                addObject(Uri.parse(subtitle.toString()));
+                addObject(Uri.parse(BASE_URL + subtitle.toString()));
                 searchView.setText(title.toString());
                 mHistoryDatabase.addItem(item);
             }

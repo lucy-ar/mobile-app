@@ -1,34 +1,46 @@
 [
   {
     "furniture" : "Dishwasher",
-    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Dishwasher.gltf"
+    "gltf_file": "Dishwasher.gltf"
   },
   {
     "furniture" : "Roomba",
-    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/DomesticRobot_1293.gltf"
+    "gltf_file": "DomesticRobot_1293.gltf"
   },
   {
     "furniture" : "Easel",
-    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Easel.gltf"
+    "gltf_file": "Easel.gltf"
   },
   {
     "furniture" : "Stereo",
-    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Hi-fi%20stereo.gltf"
+    "gltf_file": "Hi-fi_stereo.gltf"
   },
   {
     "furniture" : "Refrigerator",
-    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Refrigerator_01.gltf"
+    "gltf_file": "Refrigerator_01.gltf"
   },
   {
     "furniture" : "Stool",
-    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/Stool_01.gltf"
+    "gltf_file": "Stool_01.gltf"
   },
   {
     "furniture" : "TV",
-    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/TV_01.gltf"
+    "gltf_file": "TV_01.gltf"
   },
   {
     "furniture" : "Couch",
-    "gltf_file": "https://github.com/lucy-ar/models/raw/master/renderables/couch.gltf"
+    "gltf_file": "couch.gltf"
+  },
+  {
+    "furniture" : "Bed",
+    "gltf_file": "Bed_01.gltf"
+  },
+  {
+    "furniture" : "Chair",
+    "gltf_file": "Chair.gltf"
+  },
+  {
+    "furniture" : "Table",
+    "gltf_file": "Table_01.gltf"
   }
 ]

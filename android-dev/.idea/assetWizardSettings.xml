@@ -48,7 +48,7 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundLayerName" value="search_icon_background" />
-                                      <entry key="foregroundImage" value="C:\Users\Benjamin\Documents\QTMA\lucy\android-dev\app\src\main\res\drawable\small_grey.png" />
+                                      <entry key="foregroundImage" value="C:\Users\Benjamin\Documents\QTMA\lucy\logo.png" />
                                       <entry key="foregroundLayerName" value="profile" />
                                       <entry key="outputName" value="profile_icon" />
                                     </map>
@@ -131,11 +131,6 @@
                                 </PersistentState>
                               </value>
                             </entry>
-                          </map>
-                        </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="NOTIFICATION" />
                           </map>
                         </option>
                       </PersistentState>

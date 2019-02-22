@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -268,7 +269,6 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 SearchItem item = new SearchItem(Sceneform.this);
                 item.setTitle(title);
                 item.setSubtitle(subtitle);
-//                dynamicLoad("Bed_01");
                 addObject(Uri.parse(BASE_URL + subtitle.toString()));
                 searchView.setText(title.toString());
                 mHistoryDatabase.addItem(item);
@@ -427,8 +427,8 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 Uri photoURI = FileProvider.getUriForFile(Sceneform.this,
                     Sceneform.this.getPackageName() + ".ar.codelab.name.provider",
                     photoFile);
-                Intent intent = new Intent(Intent.ACTION_VIEW, photoURI);
-                intent.setDataAndType(photoURI, "image/*");
+                Intent intent = new Intent(this, PhotoScreen.class);
+                intent.putExtra("photo", photoURI.toString());
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
             } else {

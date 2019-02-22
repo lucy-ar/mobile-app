@@ -37,11 +37,6 @@
             android:text="@string/signed_out"
             android:textColor="@color/white" />
 
-        <TextView
-            android:id="@+id/detail"
-            style="@style/ThemeOverlay.MyTextDetail"
-            tools:text="Firebase User ID: 123456789abc" />
-
     </LinearLayout>
 
 

@@ -64,7 +64,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private GoogleSignInClient mGoogleSignInClient;
     private TextView mStatusTextView;
-    private TextView mDetailTextView;
     private ProgressDialog mProgressDialog;
 
     public void showProgressDialog() {
@@ -91,7 +90,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         // Views
         mStatusTextView = findViewById(R.id.status);
-        mDetailTextView = findViewById(R.id.detail);
 
         // Button listeners
         findViewById(R.id.signInButton).setOnClickListener(this);
@@ -219,13 +217,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         hideProgressDialog();
         if (user != null) {
             mStatusTextView.setText(getString(R.string.google_status_fmt, user.getEmail()));
-            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
             findViewById(R.id.signInButton).setVisibility(View.GONE);
             findViewById(R.id.signOutAndDisconnect).setVisibility(View.VISIBLE);
         } else {
             mStatusTextView.setText(R.string.signed_out);
-            mDetailTextView.setText(null);
 
             findViewById(R.id.signInButton).setVisibility(View.VISIBLE);
             findViewById(R.id.signOutAndDisconnect).setVisibility(View.GONE);

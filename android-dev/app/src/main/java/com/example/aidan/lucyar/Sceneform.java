@@ -16,8 +16,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.PixelCopy;
 import android.view.View;
 import android.view.Window;
@@ -25,11 +27,15 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import com.example.aidan.lucyar.drawar.DrawAR;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.ar.core.Anchor;
+import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -37,12 +43,15 @@ import com.google.ar.core.Trackable;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
+import com.google.ar.sceneform.HitTestResult;
+import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -90,6 +99,16 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private boolean lock_gltf = false;
     private boolean lock_bin = false;
     private static String BASE_URL = "https://github.com/lucy-ar/models/raw/master/renderables/";
+    private enum AppAnchorState {
+        NONE,
+        HOSTING,
+        HOSTED
+    }
+    private AppAnchorState appAnchorState = AppAnchorState.NONE;
+    private GestureDetector gestureDetector;
+    private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +124,28 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         ARyouSure();
         toTheWall();
         setupDraw();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mAuth = FirebaseAuth.getInstance();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener(){
+            @Override
+            public void onLongPress(MotionEvent e) {
+                super.onLongPress(e);
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                return super.onDoubleTap(e);
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     private void onUpdate() {
@@ -211,23 +252,28 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
+        node.setOnTouchListener(new Node.OnTouchListener() {
+            @Override
+            public boolean onTouch(HitTestResult hitTestResult, MotionEvent motionEvent) {
+                return false;
+            }
+        });
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-//            case R.id.share:
-//                Intent myIntent = new Intent(Intent.ACTION_SEND);
-//                myIntent.setType("text/plain");
-//                String shareBody = "Your body here";
-//                String shareSub = "Your Subject here";
-//                myIntent.putExtra(Intent.EXTRA_SUBJECT, shareSub);
-//                myIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-//                startActivity(Intent.createChooser(myIntent, "Share using"));
-//                break;
             case R.id.login:
-                Intent loginPage = new Intent(Sceneform.this, LoginActivity.class);
-                startActivity(loginPage);
+                mAuth.signOut();
+                mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Intent loginPage = new Intent(Sceneform.this, LoginActivity.class);
+                        loginPage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(loginPage);
+                        finish();
+                    }
+                });
                 break;
             case R.id.gallery:
                 break;
@@ -429,7 +475,8 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                     photoFile);
                 Intent intent = new Intent(this, PhotoScreen.class);
                 intent.putExtra("photo", photoURI.toString());
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.removeFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 startActivity(intent);
             } else {
                 Toast toast = Toast.makeText(Sceneform.this,

@@ -51,4 +51,12 @@ public class PhotoScreen extends AppCompatActivity {
             }
         });
     }
+//
+//    @Override
+//    public void onBackPressed() {
+//        super.onBackPressed();
+//        Intent sceneform = new Intent(this, Sceneform.class);
+//        sceneform.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(sceneform);
+//    }
 }

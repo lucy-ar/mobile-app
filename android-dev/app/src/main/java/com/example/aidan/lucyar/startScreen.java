@@ -22,7 +22,7 @@ public class startScreen extends AppCompatActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent progress = new Intent(startScreen.this, Sceneform.class);
+                Intent progress = new Intent(startScreen.this, LoginActivity.class);
                 progress.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(progress);
                 finish();

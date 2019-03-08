@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import com.github.ybq.android.spinkit.style.DoubleBounce;
@@ -18,6 +19,8 @@ public class startScreen extends AppCompatActivity {
         ProgressBar progressBar = (ProgressBar)findViewById(R.id.spin_kit);
         FoldingCube foldingCube = new FoldingCube();
         progressBar.setIndeterminateDrawable(foldingCube);
+        View view = findViewById(R.id.startScreen);
+        view.getBackground().setAlpha(255);
         Handler mHandler = new Handler();
         mHandler.postDelayed(new Runnable() {
             @Override

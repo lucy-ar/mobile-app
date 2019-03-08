@@ -33,5 +33,8 @@
     <string name="signed_out">Signed Out</string>
     <string name="desc_firebase_lockup">Firebase logo and name</string>
     <string name="firebase_status_fmt">Firebase User: %s</string>
+    <string name="profile_selection">I am a...</string>
+    <string name="furniture_provider">Furniture Provider</string>
+    <string name="tenant">Tenant</string>
 
 </resources>

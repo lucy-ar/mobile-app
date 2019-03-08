@@ -2,6 +2,7 @@ package com.example.aidan.lucyar;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
@@ -15,12 +16,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.PixelCopy;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -108,12 +113,14 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private GestureDetector gestureDetector;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
-
+    private Typeface face;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sceneform);
+        face = Typeface.createFromAsset(getAssets(), "montserratlight.ttf");
+
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
         toTheWindow();
@@ -305,9 +312,11 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
 
     public void setupSearch() {
         searchView = (SearchView) findViewById(R.id.searchView);
+        searchView.setTextFont(face);
         final SearchHistoryTable mHistoryDatabase = new SearchHistoryTable(this);
 
         searchAdapter = new SearchAdapter(this);
+        searchAdapter.setTextFont(face);
         searchAdapter.setSuggestionsList(suggestions);
         searchAdapter.setOnSearchItemClickListener(new SearchAdapter.OnSearchItemClickListener() {
             @Override
@@ -370,7 +379,24 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     public void tooManySideNavs() {
         drawerLayout = (DrawerLayout) findViewById(R.id.sceneform_drawer);
         NavigationView navigationView = (NavigationView) findViewById(R.id.sceneform_nav);
+        navigationView.getBackground().setAlpha(200);
+        Menu m = navigationView.getMenu();
+        for (int i=0;i<m.size();i++) {
+            MenuItem mi = m.getItem(i);
+
+            //for aapplying a font to subMenu ...
+            SubMenu subMenu = mi.getSubMenu();
+            if (subMenu!=null && subMenu.size() >0 ) {
+                for (int j=0; j <subMenu.size();j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    applyFontToMenuItem(subMenuItem);
+                }
+            }
+            //the method we have create in activity
+            applyFontToMenuItem(mi);
+        }
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     public void toTheWindow() {
@@ -445,6 +471,11 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         }
     }
 
+    private void applyFontToMenuItem(MenuItem mi) {
+        SpannableString mNewTitle = new SpannableString(mi.getTitle());
+        mNewTitle.setSpan(new CustomTypefaceSpan("" , face), 0 , mNewTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        mi.setTitle(mNewTitle);
+    }
     private void takePhoto() {
         final String filename = generateFilename();
         ArSceneView view = fragment.getArSceneView();

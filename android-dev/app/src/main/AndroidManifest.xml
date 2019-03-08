@@ -37,9 +37,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustPan">
-        <meta-data
-            android:name="com.google.android.ar.API_KEY"
-            android:value="AIzaSyCCstncVx_zDtju101C0wEVI42JRXzy-n4"/>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.ar.codelab.name.provider"
@@ -67,7 +64,8 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".drawar.objectAR" />
         <activity android:name=".Sceneform" />
-        <activity android:name=".PhotoScreen"></activity>
+        <activity android:name=".PhotoScreen" />
+        <activity android:name=".SelectProfile"></activity>
     </application>
 
 </manifest>

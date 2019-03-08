@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0B2265"
+    android:orientation="vertical"
+    android:weightSum="5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="vertical"
+        android:background="#0B2265">
+
+        <ImageView
+            android:id="@+id/profile_logo"
+            style="@style/ThemeOverlay.FirebaseIcon"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:src="@drawable/tina_s"
+            android:contentDescription="@string/desc_firebase_lockup" />
+
+        <TextView
+            android:id="@+id/profile_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/title_bottom_margin"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="32dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:background="#0B2265"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/iam"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_selection"
+            android:textColor="@color/white"
+            android:textSize="24dp"
+            android:layout_marginBottom="@dimen/title_bottom_margin" />
+
+        <Button
+            android:id="@+id/furniture"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="@string/furniture_provider"/>
+        <Button
+            android:id="@+id/tenant"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="@string/tenant"/>
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

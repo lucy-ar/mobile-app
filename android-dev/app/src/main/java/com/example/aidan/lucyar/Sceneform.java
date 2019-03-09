@@ -84,6 +84,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 
 public class Sceneform extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private ArFragment fragment;
@@ -137,17 +139,6 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 .build();
         mAuth = FirebaseAuth.getInstance();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener(){
-            @Override
-            public void onLongPress(MotionEvent e) {
-                super.onLongPress(e);
-            }
-
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                return super.onDoubleTap(e);
-            }
-        });
     }
 
     @Override
@@ -245,7 +236,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 throwable -> {
                     Toast toast =
                             Toast.makeText(this, "Unable to load renderable " +
-                                    model.toString(), Toast.LENGTH_LONG);
+                                    model.toString(), LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                     return null;
@@ -262,9 +253,11 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         node.setOnTouchListener(new Node.OnTouchListener() {
             @Override
             public boolean onTouch(HitTestResult hitTestResult, MotionEvent motionEvent) {
+                gestureDetector.onTouchEvent(motionEvent);
                 return false;
             }
         });
+
     }
 
     @Override
@@ -494,7 +487,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                     saveBitmapToDisk(bitmap, filename);
                 } catch (IOException e) {
                     Toast toast = Toast.makeText(Sceneform.this, e.toString(),
-                            Toast.LENGTH_LONG);
+                            LENGTH_LONG);
                     toast.show();
                     return;
                 }
@@ -511,10 +504,23 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 startActivity(intent);
             } else {
                 Toast toast = Toast.makeText(Sceneform.this,
-                        "Failed to copyPixels: " + copyResult, Toast.LENGTH_LONG);
+                        "Failed to copyPixels: " + copyResult, LENGTH_LONG);
                 toast.show();
             }
             handlerThread.quitSafely();
         }, new Handler(handlerThread.getLooper()));
+    }
+
+    public void objectGestureListener(MotionEvent e, TransformableNode base, AnchorNode anchorNode) {
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener(){
+            @Override
+            public void onLongPress(MotionEvent e) {
+                super.onLongPress(e);
+                Toast toast = Toast.makeText(Sceneform.this, "deleted object", LENGTH_LONG);
+                toast.show();
+
+                anchorNode.removeChild(base);
+            }
+        });
     }
 }

@@ -1,5 +1,6 @@
 package com.example.aidan.lucyar;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -7,7 +8,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -30,17 +30,16 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.aidan.lucyar.drawar.DrawAR;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Config;
 import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -52,12 +51,12 @@ import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
+import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.lapism.searchview.Search;
@@ -65,10 +64,6 @@ import com.lapism.searchview.database.SearchHistoryTable;
 import com.lapism.searchview.widget.SearchAdapter;
 import com.lapism.searchview.widget.SearchItem;
 import com.lapism.searchview.widget.SearchView;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.FileAsyncHttpResponseHandler;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,8 +76,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 
 import static android.widget.Toast.LENGTH_LONG;
 
@@ -106,6 +99,8 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private boolean lock_gltf = false;
     private boolean lock_bin = false;
     private static String BASE_URL = "https://github.com/lucy-ar/models/raw/master/renderables/";
+    private AlertDialog alertDialog;
+
     private enum AppAnchorState {
         NONE,
         HOSTING,
@@ -116,13 +111,16 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
     private Typeface face;
+    private AlertDialog alert;
+    private TextView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sceneform);
         face = Typeface.createFromAsset(getAssets(), "montserratlight.ttf");
-
+        view = new TextView(this);
+        view.setTypeface(face);
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
         toTheWindow();
@@ -250,6 +248,15 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
+        gestureDetector = new GestureDetector(Sceneform.this, new GestureDetector.SimpleOnGestureListener(){
+            @Override
+            public void onLongPress(MotionEvent e) {
+                super.onLongPress(e);
+                Toast toast = Toast.makeText(Sceneform.this, "deleted object", LENGTH_LONG);
+                toast.show();
+                dialogCreator(anchorNode, node);
+            }
+        });
         node.setOnTouchListener(new Node.OnTouchListener() {
             @Override
             public boolean onTouch(HitTestResult hitTestResult, MotionEvent motionEvent) {
@@ -469,6 +476,8 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         mNewTitle.setSpan(new CustomTypefaceSpan("" , face), 0 , mNewTitle.length(),  Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         mi.setTitle(mNewTitle);
     }
+
+
     private void takePhoto() {
         final String filename = generateFilename();
         ArSceneView view = fragment.getArSceneView();
@@ -511,16 +520,22 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         }, new Handler(handlerThread.getLooper()));
     }
 
-    public void objectGestureListener(MotionEvent e, TransformableNode base, AnchorNode anchorNode) {
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener(){
-            @Override
-            public void onLongPress(MotionEvent e) {
-                super.onLongPress(e);
-                Toast toast = Toast.makeText(Sceneform.this, "deleted object", LENGTH_LONG);
-                toast.show();
-
-                anchorNode.removeChild(base);
+    private void dialogCreator(AnchorNode anchorNode, Node node){
+        alertDialog = new AlertDialog.Builder(Sceneform.this, R.style.Theme_MaterialComponents_Light_Dialog).create();
+        alertDialog.setTitle("Delete?");
+        alertDialog.setMessage("Would you like to delete this " + node.getName() + "?");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                anchorNode.removeChild(node);
             }
         });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        alertDialog.show();
     }
+
 }

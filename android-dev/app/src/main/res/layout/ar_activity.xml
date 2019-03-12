@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/content"
-    tools:context="com.example.aidan.lucyar.drawar.DrawAR">
+    tools:context="com.lucy.ar.production.drawar.DrawAR">
 
     <com.arlib.floatingsearchview.FloatingSearchView
         android:layout_height="match_parent"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.aidan.lucyar">
+    package="com.lucy.ar.production">
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -52,20 +52,20 @@
             android:value="optional" />
 
         <activity
-            android:name=".drawar.DrawAR"
+            android:name="com.lucy.ar.production.drawar.DrawAR"
             android:label="ar draw" />
-        <activity android:name=".startScreen">
+        <activity android:name="com.lucy.ar.production.startScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".drawar.objectAR" />
-        <activity android:name=".Sceneform" />
-        <activity android:name=".PhotoScreen" />
-        <activity android:name=".SelectProfile"></activity>
+        <activity android:name="com.lucy.ar.production.LoginActivity" />
+        <activity android:name="com.lucy.ar.production.drawar.objectAR" />
+        <activity android:name="com.lucy.ar.production.Sceneform" />
+        <activity android:name="com.lucy.ar.production.PhotoScreen" />
+        <activity android:name="com.lucy.ar.production.SelectProfile"></activity>
     </application>
 
 </manifest>

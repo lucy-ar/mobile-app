@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.ar.sceneform.ux.ScaleController;
 import com.lucy.ar.production.drawar.DrawAR;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -111,6 +113,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private Typeface face;
     private AlertDialog alert;
     private TextView view;
+    private Search.OnOpenCloseListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,8 +253,6 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
             @Override
             public void onLongPress(MotionEvent e) {
                 super.onLongPress(e);
-                Toast toast = Toast.makeText(Sceneform.this, "deleted object", LENGTH_LONG);
-                toast.show();
                 dialogCreator(anchorNode, node);
             }
         });
@@ -280,10 +281,10 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                     }
                 });
                 break;
-            case R.id.gallery:
-                break;
-            case R.id.settings:
-                break;
+//            case R.id.gallery:
+//                break;
+//            case R.id.settings:
+//                break;
         }
         return true;
     }
@@ -312,37 +313,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         searchView = (SearchView) findViewById(R.id.searchView);
         searchView.setTextFont(face);
         final SearchHistoryTable mHistoryDatabase = new SearchHistoryTable(this);
-
-        searchAdapter = new SearchAdapter(this);
-        searchAdapter.setTextFont(face);
-        searchAdapter.setSuggestionsList(suggestions);
-        searchAdapter.setOnSearchItemClickListener(new SearchAdapter.OnSearchItemClickListener() {
-            @Override
-            public void onSearchItemClick(int position, CharSequence title, CharSequence subtitle) {
-                SearchItem item = new SearchItem(Sceneform.this);
-                item.setTitle(title);
-                item.setSubtitle(subtitle);
-                addObject(Uri.parse(BASE_URL + subtitle.toString()));
-                searchView.setText(title.toString());
-                mHistoryDatabase.addItem(item);
-            }
-        });
-
-        searchView.setAdapter(searchAdapter);
-        searchView.setOnQueryTextListener(new Search.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(CharSequence query) {
-                SearchItem item = new SearchItem(Sceneform.this);
-                item.setTitle(query);
-                mHistoryDatabase.addItem(item);
-                return true;
-            }
-            @Override
-            public void onQueryTextChange(CharSequence newText) {
-            }
-        });
-
-        searchView.setOnOpenCloseListener(new Search.OnOpenCloseListener() {
+        listener = new Search.OnOpenCloseListener() {
             @Override
             public void onOpen() {
                 searchView.setBackgroundColor(getColor(R.color.white));
@@ -359,8 +330,40 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 searchView.setTextColor(getColor(R.color.white));
                 searchView.setHintColor(getColor(R.color.white));
             }
+
+        };
+        searchView.setOnQueryTextListener(new Search.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(CharSequence query) {
+                SearchItem item = new SearchItem(Sceneform.this);
+                item.setTitle(query);
+                mHistoryDatabase.addItem(item);
+                return true;
+            }
+            @Override
+            public void onQueryTextChange(CharSequence newText) {
+            }
         });
 
+        searchView.setOnOpenCloseListener(listener);
+
+        searchAdapter = new SearchAdapter(this);
+        searchAdapter.setTextFont(face);
+        searchAdapter.setSuggestionsList(suggestions);
+        searchAdapter.setOnSearchItemClickListener(new SearchAdapter.OnSearchItemClickListener() {
+            @Override
+            public void onSearchItemClick(int position, CharSequence title, CharSequence subtitle) {
+                SearchItem item = new SearchItem(Sceneform.this);
+                item.setTitle(title);
+                item.setSubtitle(subtitle);
+                addObject(Uri.parse(BASE_URL + subtitle.toString()));
+                searchView.setText(title.toString());
+                mHistoryDatabase.addItem(item);
+            }
+
+        });
+
+        searchView.setAdapter(searchAdapter);
         searchView.setOnLogoClickListener(new Search.OnLogoClickListener() {
             @Override
             public void onLogoClick() {

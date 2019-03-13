@@ -1,35 +1,43 @@
 {
   "project_info": {
-    "project_number": "564798917027",
-    "firebase_url": "https://android-dev-356d4.firebaseio.com",
-    "project_id": "android-dev-356d4",
-    "storage_bucket": "android-dev-356d4.appspot.com"
+    "project_number": "808739105180",
+    "firebase_url": "https://lucyar-325dd.firebaseio.com",
+    "project_id": "lucyar-325dd",
+    "storage_bucket": "lucyar-325dd.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:564798917027:android:0f2da662814fd3ab",
+        "mobilesdk_app_id": "1:808739105180:android:4bf058f61d4b8703",
         "android_client_info": {
           "package_name": "com.lucy.ar.production"
         }
       },
       "oauth_client": [
         {
-          "client_id": "564798917027-bstsetmhilhb7ahpv9mt02m6lmsfpdps.apps.googleusercontent.com",
+          "client_id": "808739105180-chilctuhrpud5703h6akr0pm8p60h173.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.aidan.lucyar",
+            "package_name": "com.lucy.ar.production",
+            "certificate_hash": "456dee1ba692d37dc8edbc79247959ed5b4117cf"
+          }
+        },
+        {
+          "client_id": "808739105180-ahs4ljheu70q0u8f2nqqdn2s4k84uoj4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lucy.ar.production",
             "certificate_hash": "ab0898775c31b53ef27604d45216541801577cd2"
           }
         },
         {
-          "client_id": "564798917027-l7ei8s530u923mro3b8i0thogqcqbtot.apps.googleusercontent.com",
+          "client_id": "808739105180-p8d5tske67nmi7u1v41kkseqjrmt1gmq.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAnsRsECNltRVTfwglMQqwQq9N_lSaVm3k"
+          "current_key": "AIzaSyAMC3_l_vypIGDUinB7EMSeB9NsT3hXkXQ"
         }
       ],
       "services": {
@@ -40,7 +48,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "564798917027-l7ei8s530u923mro3b8i0thogqcqbtot.apps.googleusercontent.com",
+              "client_id": "808739105180-p8d5tske67nmi7u1v41kkseqjrmt1gmq.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

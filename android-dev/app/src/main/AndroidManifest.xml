@@ -17,6 +17,9 @@
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.ar"
+        android:required="true" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -49,7 +52,7 @@
 
         <meta-data
             android:name="com.google.ar.core"
-            android:value="optional" />
+            android:value="required" />
 
         <activity
             android:name="com.lucy.ar.production.drawar.DrawAR"

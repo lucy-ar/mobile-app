@@ -35,14 +35,18 @@ public class SelectProfile extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             Intent login = new Intent(SelectProfile.this, Sceneform.class);
+            login.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(login);
+            finish();
         }
 
         tenant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent login = new Intent(SelectProfile.this, Sceneform.class);
+                login.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(login);
+                finish();
             }
         });
 

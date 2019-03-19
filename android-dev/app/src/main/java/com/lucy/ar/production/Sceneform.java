@@ -93,13 +93,9 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
     private ImageButton draw;
     private FirebaseStorage storage;
     private StorageReference storageRef;
-    private File gltf;
-    private File bin;
-    private String gltfFile = "http://10.0.2.2:5000/models/Bed_01.gltf";
-    private boolean lock_gltf = false;
-    private boolean lock_bin = false;
     private static String BASE_URL = "https://github.com/lucy-ar/models/raw/master/renderables/";
-    private AlertDialog alertDialog;
+    private ImageButton delete;
+    private int objectCount = 0;
 
     private enum AppAnchorState {
         NONE,
@@ -124,6 +120,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         view.setTypeface(face);
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
+        delete = findViewById(R.id.delete);
         toTheWindow();
         tooManySideNavs();
         FABulous();
@@ -210,7 +207,6 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
                 if (trackable instanceof Plane &&
                         ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
                     placeObject(fragment, hit.createAnchor(), model);
-                    //Log.d("fuck", "second part add object: ");
                     break;
 
                 }
@@ -249,20 +245,20 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
-        gestureDetector = new GestureDetector(Sceneform.this, new GestureDetector.SimpleOnGestureListener(){
-            @Override
-            public void onLongPress(MotionEvent e) {
-                super.onLongPress(e);
-                dialogCreator(anchorNode, node);
-            }
-        });
+        delete.setVisibility(View.VISIBLE);
+        objectCount++;
+        Toast toast = Toast.makeText(Sceneform.this, "object count = " + objectCount,
+                LENGTH_LONG);
+        toast.show();
+
         node.setOnTouchListener(new Node.OnTouchListener() {
             @Override
             public boolean onTouch(HitTestResult hitTestResult, MotionEvent motionEvent) {
-                gestureDetector.onTouchEvent(motionEvent);
+                updateDeleteClickListener(anchorNode, hitTestResult.getNode());
                 return false;
             }
         });
+
 
     }
 
@@ -385,7 +381,7 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         for (int i=0;i<m.size();i++) {
             MenuItem mi = m.getItem(i);
 
-            //for aapplying a font to subMenu ...
+            //for applying a font to subMenu ...
             SubMenu subMenu = mi.getSubMenu();
             if (subMenu!=null && subMenu.size() >0 ) {
                 for (int j=0; j <subMenu.size();j++) {
@@ -521,22 +517,13 @@ public class Sceneform extends AppCompatActivity implements NavigationView.OnNav
         }, new Handler(handlerThread.getLooper()));
     }
 
-    private void dialogCreator(AnchorNode anchorNode, Node node){
-        alertDialog = new AlertDialog.Builder(Sceneform.this, R.style.Theme_MaterialComponents_Light_Dialog).create();
-        alertDialog.setTitle("Delete?");
-        alertDialog.setMessage("Would you like to delete this " + node.getName() + "?");
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
+    private void updateDeleteClickListener (AnchorNode anchorNode, Node node){
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 anchorNode.removeChild(node);
             }
         });
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        alertDialog.show();
     }
 
 }

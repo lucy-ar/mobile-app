@@ -31,6 +31,14 @@
           }
         },
         {
+          "client_id": "808739105180-071rcg4r16r084sr8m290iumia4ldooa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lucy.ar.production",
+            "certificate_hash": "b60073e3f83e5bc8ba8689591d8ace569c8784b7"
+          }
+        },
+        {
           "client_id": "808739105180-p8d5tske67nmi7u1v41kkseqjrmt1gmq.apps.googleusercontent.com",
           "client_type": 3
         }

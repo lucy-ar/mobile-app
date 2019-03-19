@@ -14,6 +14,7 @@ public class PhotoScreen extends AppCompatActivity {
     private ImageView photoTaken;
     private ImageButton share;
     private ImageButton feed;
+    private ImageButton cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +22,7 @@ public class PhotoScreen extends AppCompatActivity {
         setContentView(R.layout.photo_screen);
         photoTaken = findViewById(R.id.photo);
         share = findViewById(R.id.share);
+        cancel = findViewById(R.id.cancel);
         feed = findViewById(R.id.feed);
         Intent intent = getIntent();
         imagePath = intent.getStringExtra("photo");
@@ -28,6 +30,7 @@ public class PhotoScreen extends AppCompatActivity {
         photoTaken.setImageURI(photo);
         shareButton();
         addToFeed();
+        cancel();
     }
 
     public void shareButton(){
@@ -39,6 +42,15 @@ public class PhotoScreen extends AppCompatActivity {
                 shareIntent.putExtra(Intent.EXTRA_STREAM, photo);
                 shareIntent.setType("image/jpeg");
                 startActivity(Intent.createChooser(shareIntent, "Look at what I made with LucyAR"));
+            }
+        });
+    }
+
+    public void cancel() {
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
     }

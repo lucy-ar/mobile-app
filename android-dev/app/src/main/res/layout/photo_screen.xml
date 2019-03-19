@@ -7,7 +7,6 @@
     tools:context=".PhotoScreen"
     android:orientation="vertical"
     android:background="@color/black">
-
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -46,6 +45,24 @@
 
         </LinearLayout>
 
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/photo">
+        <ImageButton
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_clear_white_24dp"
+            android:background="@color/transparent"
+            android:layout_marginTop="30dp"
+            android:padding="10dp"
+            android:layout_marginStart="15dp"
+            android:scaleType="fitCenter"
+            android:scaleX="1.5"
+            android:scaleY="1.5"/>
     </RelativeLayout>
 
 
